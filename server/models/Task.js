@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 const { Schema, model } = mongoose;
 
 const taskSchema = new Schema({
@@ -17,28 +17,33 @@ const taskSchema = new Schema({
     status: {
         type: String,
         required: true,
-        enum: ['Backlog', 'InProgress', 'Completed'],
+        enum: ['backlog', 'in progress', 'completed'],
         default: 'Backlog',
     },
-    createAt : {
+    created_at : {
         type: Date,
-        default: Date.now,
+        default: () => {
+            const currentDate = new Date();
+            return currentDate.toISOString().split('T')[0];
+        },
     },
-    updatedAt: {
+    updated_at: {
         type: Date,
-        default: Date.now,
+        default: () => {
+            const currentDate = new Date();
+            return currentDate.toISOString().split('T')[0];
+        }
     },
     category: {
         type: String,
         required: true,
-        enum: ['Personal', 'Work', 'Study'],
+        enum: ['personal', 'work', 'study'],
     },
     priority: {
         type: String,
         required: true,
-        enum: ['Low', 'Medium', 'High'],
-    },
-    timestamps: true,
+        enum: ['low', 'medium', 'high'],
+    }
 });
 
-const Task = model('Task', taskSchema);
+module.exports = model('Task', taskSchema);

@@ -1,5 +1,5 @@
 export interface Task {
-    id: number;
+    _id: string;
     title: string;
     description: string;
     status: TaskStatus;
@@ -19,9 +19,9 @@ export interface TaskContextType{
     tasks: Task[];
     addTask: (task: Task) => void;
     updateTask: (task: Task) => void;
-    deleteTask: (id: number) => void;
-    updateStatus: (taskId: number, newStatus: TaskStatus) => void;
-    updatePriority: (taskId: number, newPriority: taskPriority) => void;
+    deleteTask: (id: string) => void;
+    updateStatus: (taskId: string, newStatus: TaskStatus) => void;
+    updatePriority: (taskId: string, newPriority: taskPriority) => void;
 }
 
 export enum taskType {
@@ -34,4 +34,10 @@ export enum taskPriority {
     Low = "low",
     Medium = "medium",
     High = "high"
+}
+
+export interface register {
+    username: string;
+    email: string;
+    password: string;
 }

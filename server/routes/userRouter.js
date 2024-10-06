@@ -1,40 +1,27 @@
-import express from "express";
+const express = require('express');
 const router = express.Router();
+const userController = require('../controllers/userController');
 
-router.get('/', (req, res) => {
-    res.send('Welcome to the User Page');
-});
+// router.get('/', userController.getUserPage);
 
-router.get('/profile', (req, res) => {
-    res.send('Welcome to the User Profile Page');
-});
+router.get('/profile', userController.getUserProfile);
 
-router.get('/tasks', (req, res) => {
-    res.send('Welcome to the User Tasks Page');
-});
+router.get('/tasks', userController.getUserTasks);
 
-router.get('/tasks/:id', (req, res) => {
-    res.send('Welcome to the User Task By Id Page');
-});
+router.get('/tasks/:id', userController.getUserTaskById);
 
-router.post('/tasks', (req, res) => {
-    res.send('Welcome to the User Task Create Page');
-});
+router.post('/tasks', userController.createUserTask);
 
-router.put('/tasks/:id', (req, res) => {
-    res.send('Welcome to the User Task Update Page');
-});
+router.put('/tasks/:id', userController.updateUserTask);
 
-router.delete('/tasks/:id', (req, res) => {
-    res.send('Welcome to the User Task Delete Page');
-});
+router.delete('/tasks/:id', userController.deleteUserTask);
 
-router.get('/logout', (req, res) => {
-    res.send('Welcome to the User Logout Page');
-});
+router.put('/tasks/:id/status', userController.updateTaskStatus);
 
-router.get('/taskspriority', (req, res) => {
-    res.send('Welcome to the User Tasks Priority Page');
-});
+router.put('/update-priority/:id', userController.updateTaskPriority);
 
-modules.exports = router;
+router.get('/logout', userController.userLogout);
+
+router.get('/taskspriority', userController.getUserTasksPriority);
+
+module.exports = router;

@@ -4,8 +4,8 @@ import {Box, Container, Paper, Typography} from '@mui/material'
 const About: React.FC = () => {
   return (
     <Container>
-      <Box sx={{display:"flex", alignItems:"center", justifyContent:"center", width:'100%', height:'100%'}}>
-        <Paper sx={{width:'90%', height:'90%', padding:'10px'}}>
+      <Box sx={{display:"flex", alignItems:"center", justifyContent:"center", width:'100%', height:'100%', marginTop:'10px'}}>
+        <Paper sx={{width:'90%', height:'100%', padding:'10px'}}>
           <Typography variant="h3" textAlign={"center"}>About</Typography>
           <hr />
           <Box>

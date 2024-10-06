@@ -7,13 +7,13 @@ import TaskCard from "./TaskCard";
 interface TaskColumnParms{
     status: TaskStatus;
     tasks: Task[];
-    onDropTask: (taskId : number, newStatus: TaskStatus ) => void;
+    onDropTask: (taskId : string, newStatus: TaskStatus ) => void;
 }
 const TaskColumn : React.FC<TaskColumnParms> = ({status, tasks, onDropTask}) =>{
 
     const [, drop] = useDrop({
         accept: 'TASK',
-        drop: (item: { id: number }) => onDropTask(item.id, status),
+        drop: (item: { id: string }) => onDropTask(item.id, status),
     });
 
     return (
@@ -37,7 +37,7 @@ const TaskColumn : React.FC<TaskColumnParms> = ({status, tasks, onDropTask}) =>{
             }
          }}>
             {tasks.map(task => (
-                <TaskCard key={task.id} task={task} />
+                <TaskCard key={task._id} task={task} />
             ))}
         </Box>
     );

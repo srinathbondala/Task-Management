@@ -64,7 +64,7 @@ const AccountMenu:React.FC<AccountMenuProps> = ({tasks}) => {
         setFilteredTasks(filtered);
     };
 
-    const handleTaskSelect = (taskId: number) => {
+    const handleTaskSelect = (taskId: string) => {
         navigate(`edit/${taskId}`);
         setOpenDialog(false);
     };
@@ -99,10 +99,10 @@ const AccountMenu:React.FC<AccountMenuProps> = ({tasks}) => {
                     <List>
                         {filteredTasks.map((task) => (
                             <ListItem
-                            key={task.id}
+                            key={task._id}
                             component="li"
                             sx={{ cursor: 'pointer' , '&:hover': {backgroundColor: 'lightgray'}}}
-                            onClick={() => handleTaskSelect(task.id)}
+                            onClick={() => handleTaskSelect(task._id)}
                             >
                                 <ListItemText primary={task.title} />
                             </ListItem>
