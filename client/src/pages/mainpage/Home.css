@@ -1,0 +1,24 @@
+
+.main-board h2 {
+    text-align: center;
+}
+
+.board {
+    display: flex;
+    justify-content: space-between;
+}
+
+.board-column {
+    height: 80vh;
+    border: 2px dashed #bdc3c7;
+    padding: 16px;
+    background: white;
+    border-radius: 5px;
+    overflow-y: auto;
+    margin-left:5px !important;
+    margin-bottom: 4px !important;
+}
+
+.board-column h3 {
+    text-align: center;
+}

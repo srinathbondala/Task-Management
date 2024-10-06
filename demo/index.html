@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Management Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <script defer src="index.js"></script>
+</head>
+<body>
+    <div id="dashboard">
+        <!-- Sidebar with user and menu options -->
+        <div class="sidebar">
+            <h1>Task Dashboard</h1>
+            <div class="user-profile">
+                <p><strong>User:</strong> Gradious</p>
+                <button onclick="showAnalytics()">View Analytics</button>
+            </div>
+        </div>
+
+        <!-- Main Kanban Board Area -->
+        <div class="main-board">
+            <h2>Kanban Board</h2>
+            <div class="board">
+                <!-- Backlog Column -->
+                <div class="board-column" id="backlog" ondrop="drop(event)" ondragover="allowDrop(event)">
+                    <h3>Backlog</h3>
+                    <div class="task" draggable="true" data-status="backlog" id="task1">Design new logo</div>
+                    <div class="task" draggable="true" data-status="backlog" id="task2">Write blog post</div>
+                </div>
+
+                <!-- In Progress Column -->
+                <div class="board-column" id="in-progress" ondrop="drop(event)" ondragover="allowDrop(event)">
+                    <h3>In Progress</h3>
+                </div>
+
+                <!-- Completed Column -->
+                <div class="board-column" id="completed" ondrop="drop(event)" ondragover="allowDrop(event)">
+                    <h3>Completed</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics Section -->
+        <div id="analytics" class="analytics-section">
+            <h2>Task Analytics</h2>
+            <div>
+                <canvas id="taskChart" width="400" height="200"></canvas>
+            </div>
+            <button onclick="hideAnalytics()">Close Analytics</button>
+        </div>
+    </div>
+</body>
+</html>
