@@ -1,5 +1,6 @@
-import jwt from 'jsonwebtoken';
-import User from '../models/User';
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const User = require('../models/User');
 require('dotenv').config();
 const jwtSecret = process.env.JWT_SECRET;
 
@@ -11,7 +12,8 @@ exports.register = async (req, res) => {
             return res.status(400).json({ message: 'User already exists!' });
         }
         const hashedPassword = await bcrypt.hash(password, 10);
-        const user = new User({ username, email, hashedPassword });
+
+        const user = new User({ username, email, password: hashedPassword });
         await user.save();
         res.status(201).json({ message: 'User created successfully!' });
     }

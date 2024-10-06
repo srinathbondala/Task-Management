@@ -1,8 +1,8 @@
-import connectDB from './dbconfig/db';
+const connectDB = require('./dbconfig/db');
 const cors = require('cors');
-import {verifyToken} from './middlewares/jwtMiddleware';
-import userRouter from './routes/userRouter';
-import authRouter from './routes/authRouter';
+const jwtMiddleware = require('./middlewares/jwtMiddleware');
+const userRouter = require('./routes/userRouter');
+const authRouter = require('./routes/authRouter');
 require('dotenv').config();
 
 const express = require('express');
@@ -14,7 +14,7 @@ app.use(cors());
 
 connectDB();
 
-app.use('/user', verifyToken, userRouter);
+app.use('/user', jwtMiddleware.verifyToken, userRouter);
 app.use('/auth', authRouter);
 
 app.get('/', (req, res) => {

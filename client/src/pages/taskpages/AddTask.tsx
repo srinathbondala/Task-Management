@@ -1,12 +1,14 @@
 import React, { useEffect, useContext } from "react";
 import { Box, Button, Container, Grid, TextField, Typography } from '@mui/material';
 import { InputLabel, MenuItem, Select, SelectChangeEvent } from "@mui/material";
-import { taskType, taskPriority, TaskStatus } from "../../Types/Task";
+import { taskType, taskPriority, TaskStatus, Task } from "../../Types/Task";
 import { useParams } from "react-router-dom";
 import { TaskContext } from "../../hooks/TaskContext";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { IconButton } from '@mui/material';
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import useToken from "../../hooks/useToken";
 
 const AddTask: React.FC = () => {
     const { id } = useParams<{ id?: string }>();
@@ -18,11 +20,12 @@ const AddTask: React.FC = () => {
     const [taskStatus, setTaskStatus] = React.useState<TaskStatus>(TaskStatus.Backlog);
     const [createdAt, setCreatedAt] = React.useState<string>('');
     const [updatedAt, setUpdatedAt] = React.useState<string>('');
+    const { token } = useToken();
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (id && taskContext) {
-            const task = taskContext.tasks.find(task => task.id == id as unknown as number);
-            console.log('Task', task);
+            const task = taskContext.tasks.find(task => task._id == id);
             if (task) {
                 setTaskTitle(task.title);
                 setTaskDescription(task.description);
@@ -36,8 +39,11 @@ const AddTask: React.FC = () => {
     }, [id, taskContext]);
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        let userid : string = "";
         e.preventDefault();
-        const newTask = {
+        
+        const newTask: Task = {
+            _id: userid || '',
             title: taskTitle,
             description: taskDescription,
             priority: taskPriorityValue,
@@ -46,7 +52,55 @@ const AddTask: React.FC = () => {
             created_at: createdAt || new Date().toISOString().split('T')[0],
             updated_at: new Date().toISOString().split('T')[0],
         };
-        console.log('Form Submitted', newTask);
+        if (taskContext) {
+            if (id) {
+                try{
+                    newTask._id = id;
+                    taskContext.updateTask(newTask);
+                    console.log('Task Updated', newTask);
+                }catch(error){}
+            } else {
+                try{
+                    axios.post('http://localhost:8080/user/tasks', {
+                        title: taskTitle,
+                        description: taskDescription,
+                        priority: taskPriorityValue,
+                        status: taskStatus,
+                        category: selectedCategory
+                    },{
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                    })
+                    .then((response) => {
+                        console.log(response);
+                        userid = response.data;
+                        newTask._id = userid;
+                        taskContext.addTask(newTask);
+                        console.log('Task Added', newTask);
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
+                    });
+                }
+                catch(error){
+                    console.error('Error:', error);
+                }
+            }
+            setSelectedCategory(taskType.Personal);
+            setTaskTitle('');
+            setTaskDescription('');
+            setTaskPriorityValue(taskPriority.Low);
+            setTaskStatus(TaskStatus.Backlog);
+            navigate(-1);
+        }
+    };
+
+    const handleDelete = () => {
+        if (id && taskContext) {
+            taskContext.deleteTask(id);
+            navigate(-1);
+        }
     };
 
     const handleCategoryChange = (e: SelectChangeEvent<taskType>) => {
@@ -60,10 +114,9 @@ const AddTask: React.FC = () => {
     const handleStatusChange = (e: SelectChangeEvent<TaskStatus>) => {
         setTaskStatus(e.target.value as TaskStatus);
     };
-    const navigate = useNavigate();
 
     return (
-        <Container sx={{ 
+        <Container sx={{
             height: '100%',
             display: 'flex',
             alignItems: 'center',
@@ -126,12 +179,9 @@ const AddTask: React.FC = () => {
                                     <MenuItem value={taskPriority.High}>High</MenuItem>
                                 </Select>
                             </Grid>
-
-                            {/* If editing an existing task, show the status and timestamps */}
                             {id && (
                                 <>
                                     <Grid item xs={4}>
-                                        {/* <InputLabel id="status-label">Status</InputLabel> */}
                                         <Select
                                             labelId="status-label"
                                             value={taskStatus}
@@ -165,7 +215,6 @@ const AddTask: React.FC = () => {
                                     </Grid>
                                 </>
                             )}
-
                             <Grid item xs={12}>
                                 <TextField
                                     label='Description'
@@ -179,30 +228,28 @@ const AddTask: React.FC = () => {
                                 />
                             </Grid>
 
-                            {
-                                id ? (
-                                    <Grid item xs={6}>
-                                        <Button sx={{ m: 1, border: '1px solid' }} variant="outlined" color="primary" onClick={() => {}}>
-                                            Delete Task
-                                        </Button>
-                                        <Button sx={{ m: 1, border: '1px solid' }} variant="outlined" color="primary" onClick={() => {}}>
-                                            Update Task
-                                        </Button>
-                                    </Grid>
-                                ) : (
-                                    <Grid item xs={12}>
-                                        <Button sx={{ m: 1, border: '1px solid' }} variant="outlined" color="primary" type="submit">
-                                            Add Task
-                                        </Button>
-                                    </Grid>
-                                )
-                            }
+                            {id ? (
+                                <Grid item xs={12}>
+                                    <Button sx={{ m: 1, border: '1px solid' }} variant="outlined" color="primary" onClick={handleDelete}>
+                                        Delete Task
+                                    </Button>
+                                    <Button sx={{ m: 1, border: '1px solid' }} variant="outlined" color="primary" type="submit">
+                                        Update Task
+                                    </Button>
+                                </Grid>
+                            ) : (
+                                <Grid item xs={12}>
+                                    <Button sx={{ m: 1, border: '1px solid' }} variant="outlined" color="primary" type="submit">
+                                        Add Task
+                                    </Button>
+                                </Grid>
+                            )}
                         </Grid>
                     </form>
                 </Box>
             </Box>
         </Container>
     );
-}
+};
 
 export default AddTask;

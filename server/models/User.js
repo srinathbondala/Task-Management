@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 const { Schema, model } = mongoose;
 
 const userSchema = new Schema({
@@ -21,13 +21,17 @@ const userSchema = new Schema({
         type: Date,
         default: Date.now,
     },
+    role: {
+        type: String,
+        enum: ["admin", "user"],
+        default: "user",
+    },
     tasks: 
     {
         type: [Schema.Types.ObjectId],
         ref: "Task",
         default: [],
-    },
-    timestamps: true,
+    }
 });
 
-const User = model("User", userSchema);
+module.exports = model("User", userSchema);

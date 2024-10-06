@@ -13,7 +13,7 @@ const Maindiv: React.FC = () => {
       <>
         <TaskProvider>
             <NavigationBar />
-             <Box
+            <Box
               component="main"
               sx={{
                 flexGrow: 1,
@@ -35,8 +35,8 @@ const Maindiv: React.FC = () => {
                 </Box>
               </Container>
             </Box> 
-          </TaskProvider>
-        </>
+        </TaskProvider>
+      </>
     );
 }
 export default Maindiv;

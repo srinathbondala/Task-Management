@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, Button, Typography, Grid, Avatar} from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import useToken from '../hooks/useToken';
 
 interface NavigationContentProps {
     toggleDrawer: (open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => void;
@@ -8,7 +9,7 @@ interface NavigationContentProps {
 
 const NavigationContent:React.FC<NavigationContentProps> = ({toggleDrawer}) => {
     const navigate = useNavigate();
-
+    const { removeToken } = useToken();
     return (
         <Box sx={{ width: { xs: 250, md: 250 }, height:"100%", maxHeight:'100vh', backgroundColor: '#2c3e50' }}>
             <Box sx={{padding:2, display: 'flex', alignItems: 'center', flexDirection: 'column'}}>
@@ -40,7 +41,7 @@ const NavigationContent:React.FC<NavigationContentProps> = ({toggleDrawer}) => {
                                 </Button>
                             </Grid>
                             <Grid item xs={12}>  
-                                <Button onClick={() => { toggleDrawer(false); window.location.href='/';}} variant="outlined" fullWidth sx={{ color: 'white', borderColor: 'white' }}>
+                                <Button onClick={() => { toggleDrawer(false); removeToken(); window.location.href='/';}} variant="outlined" fullWidth sx={{ color: 'white', borderColor: 'white' }}>
                                     Logout
                                 </Button>
                             </Grid>
