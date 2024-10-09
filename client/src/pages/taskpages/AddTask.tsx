@@ -49,8 +49,8 @@ const AddTask: React.FC = () => {
             priority: taskPriorityValue,
             status: taskStatus,
             category: selectedCategory,
-            created_at: createdAt || new Date().toISOString().split('T')[0],
-            updated_at: new Date().toISOString().split('T')[0],
+            created_at: createdAt || new Date().toISOString(),
+            updated_at: new Date().toISOString(),
         };
         if (taskContext) {
             if (id) {

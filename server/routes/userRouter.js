@@ -24,4 +24,8 @@ router.get('/logout', userController.userLogout);
 
 router.get('/taskspriority', userController.getUserTasksPriority);
 
+// analysis
+
+router.get('/completions', userController.getTaskCompletions);
+
 module.exports = router;

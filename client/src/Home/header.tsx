@@ -28,12 +28,12 @@ export default function Header() {
           onClick ={()=>{navigator('contact');}}
           >Contact</Typography>
           </Box>
-          <Typography color="inherit" sx={{marginLeft:'10px','&:hover':{
+          {/* <Typography color="inherit" sx={{marginLeft:'10px','&:hover':{
             cursor:'pointer',
             color:'lightblue'
           }}}
           onClick ={()=>{navigator('register');}}
-          >Register</Typography>
+          >Register</Typography> */}
         </Toolbar>
       </AppBar>
     </Box>

@@ -18,11 +18,12 @@ const Maindiv: React.FC = () => {
               sx={{
                 flexGrow: 1,
                 // marginLeft: { md: '300px' },
+                overflow: 'hidden',
                 height: '100vh',
               }}
             >
-              <Container disableGutters maxWidth={false} sx={{height:'100%',paddingTop: { xs: '56px', sm: '64px', md: '0',overflow:'auto' },}}>
-                <Box sx={{ bgcolor: '#ecf0f1', display: 'flex', alignItems: 'center',height:'100%' }}>
+              <Container disableGutters maxWidth={false} sx={{height:'100%',paddingTop: { xs: '56px', sm: '64px', md: '0',overflow:'auto'}}}>
+                <Box sx={{ bgcolor: '#ecf0f1', display: 'flex', alignItems: 'center',height:'100%'}}>
                     <Routes>
                       <Route path="/" element={<Home />} />
                       <Route path="/profile" element={<Profile />} />

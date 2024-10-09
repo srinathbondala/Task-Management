@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const Task = require('../models/Task');
 const jwt = require('jsonwebtoken');
+const mongoose = require('mongoose');
 // const getUserPage = async (req, res) => {
 //     res.send('Welcome to the User Page');
 // };
@@ -66,7 +67,7 @@ const createUserTask = async (req, res) => {
 const updateUserTask = async (req, res) => {
     try {
         const { id } = req.params;
-        req.body.updated_at = new Date().toISOString().split('T')[0];
+        req.body.updated_at = new Date().toISOString();
         const updatedTask = await Task.findByIdAndUpdate(id, req.body);
         if (!updatedTask) {
             return res.status(404).send('Task not found');
@@ -138,6 +139,84 @@ const getUserTasksPriority = async (req, res) => {
     }
 };
 
+const getTaskCompletions = async (req, res) => {
+    try {
+        const token = req.headers.authorization.split(' ')[1];
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const userId = decoded.id;
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+        const registeredTasks = await Task.aggregate([
+            {
+                $match: {
+                    user: new mongoose.Types.ObjectId(userId),
+                    created_at: { $gte: sevenDaysAgo },
+                },
+            },
+            {
+                $group: {
+                    _id: { $dateToString: { format: "%Y-%m-%d", date: "$created_at" } },
+                    registeredCount: { $sum: 1 },
+                },
+            },
+            {
+                $sort: { "_id": 1 },
+            },
+            {
+                $limit: 7,
+            }
+        ]);
+
+        const completedTasks = await Task.aggregate([
+            {
+                $match: {
+                    user: new mongoose.Types.ObjectId(userId),
+                    status: "completed",
+                    updated_at: { $gte: sevenDaysAgo },
+                },
+            },
+            {
+                $group: {
+                    _id: { $dateToString: { format: "%Y-%m-%d", date: "$updated_at" } },
+                    completedCount: { $sum: 1 },
+                },
+            },
+            {
+                $sort: { "_id": 1 },
+            },
+            {
+                $limit: 7,
+            }
+        ]);
+
+        const completions = await Task.aggregate([
+            { $match: { user: new mongoose.Types.ObjectId(userId) } },
+            {
+                $group: {
+                    _id: '$status',
+                    count: { $sum: 1 },
+                },
+            },
+        ]);
+
+        const response = {
+            registeredTasks,
+            completedTasks,
+            completions,
+        };
+        console.log(registeredTasks);
+        console.log("-------------------------------")
+        console.log(completedTasks);
+
+        res.status(200).json(response);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+    }
+};
+
+
 module.exports = {
     // getUserPage,
     getUserProfile,
@@ -149,5 +228,7 @@ module.exports = {
     userLogout,
     getUserTasksPriority,
     updateTaskStatus,
-    updateTaskPriority
+    updateTaskPriority,
+    getTaskCompletions,
+    
 };
