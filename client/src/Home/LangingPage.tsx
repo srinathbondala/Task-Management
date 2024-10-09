@@ -3,13 +3,11 @@ import { Box, Button, Container, Grid, Paper, TextField, Typography, CircularPro
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import useToken from '../hooks/useToken';
-import { useUserProfile } from '../hooks/userProfileContext';
 
 const LandingPage: React.FC = () => {
     const navigate = useNavigate();
     const { saveToken } = useToken();
     const [loading, setLoading] = useState(false);
-    const { setProfile } = useUserProfile();
 
     const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -22,7 +20,8 @@ const LandingPage: React.FC = () => {
         try {
             const response = await axios.post('http://localhost:8080/auth/login', { email, password });
             saveToken(response.data.token);
-            setProfile(response.data.user);
+            // setProfile(response.data.user);
+            localStorage.setItem("data",JSON.stringify(response.data));
             window.location.href = '/user/';
         } catch (error) {
             console.error('Login failed:', error);
@@ -41,7 +40,7 @@ const LandingPage: React.FC = () => {
                             <Typography variant="body1" sx={{ marginBottom: 3, width: '80%' }}>
                                 Effortlessly manage and track your tasks with Task Manager.
                             </Typography>
-                            <Button variant="contained" size="large" onClick={() => navigate('/register')}>Get Started</Button>
+                            <Button variant="contained" size="large" onClick={() => navigate('/request')}>Get Started</Button>
                         </Box>
                     </Grid>
                     <Grid item xs={12} md={6}>
@@ -70,8 +69,8 @@ const LandingPage: React.FC = () => {
                                     {loading ? <CircularProgress size={24} /> : 'Login'}
                                 </Button>
                                 <Typography variant="body2" sx={{ marginTop: 2, textAlign: 'center' }}>
-                                    Don't have an account? 
-                                    <Button onClick={() => navigate('/register')} color="primary"> Register</Button>
+                                    Don't have an access? 
+                                    <Button onClick={() => navigate('/request')} color="primary"> Register</Button>
                                 </Typography>
                             </form>
                         </Paper>

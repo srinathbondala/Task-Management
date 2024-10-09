@@ -24,14 +24,14 @@ const taskSchema = new Schema({
         type: Date,
         default: () => {
             const currentDate = new Date();
-            return currentDate.toISOString().split('T')[0];
+            return currentDate.toISOString();
         },
     },
     updated_at: {
         type: Date,
         default: () => {
             const currentDate = new Date();
-            return currentDate.toISOString().split('T')[0];
+            return currentDate.toISOString();
         }
     },
     category: {

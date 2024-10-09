@@ -51,11 +51,13 @@ const Profile: React.FC = () => {
 
     return (
         <Box sx={{ padding: 3 , display:'flex', justifyContent:'center', alignItems:'center', width:'100%'}}>
-            <Paper elevation={3} sx={{ padding: 3 }}>
+            <Paper elevation={3} sx={{ padding: 3 , width:'80%'}}>
                 <Typography variant="h4" gutterBottom>User Profile</Typography>
                 <hr />
-                <Typography variant="h6">Name: {user.username}</Typography>
-                <Typography variant="h6">Email: {user.email}</Typography>
+                <Typography variant="h6"><strong>User Name: </strong>{user.username}</Typography>
+                <Typography variant="h6"><strong>Email: </strong>{user.email}</Typography>
+                <Typography variant="h6"><strong>First Name: </strong>{user.firstName}</Typography>
+                <Typography variant="h6"><strong>Last Name: </strong>{user.lastName}</Typography>
             </Paper>
         </Box>
     );

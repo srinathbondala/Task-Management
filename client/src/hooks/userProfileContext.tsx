@@ -3,6 +3,8 @@ import React, { createContext, useContext, useState } from 'react';
 interface UserProfile {
     email: string;
     username: string;
+    fistName: string;
+    lastName: string;
     role: string;
     tasks: any[];
 }

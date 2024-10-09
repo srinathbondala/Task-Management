@@ -38,6 +38,7 @@ import About from './pages/about/About';
 import Contact from './pages/contact/Contact';
 import MainLayout from './Home/MainLayout';
 import Register from './Home/Register';
+import Request from './pages/Request/Request';
 import { Box } from '@mui/material';
 import useToken from './hooks/useToken';
 import { UserProfileProvider } from './hooks/userProfileContext';
@@ -54,6 +55,7 @@ function App() {
                       <Route path="/about" element={<About />} />
                       <Route path='/contact' element={<Contact />} />
                       <Route path='/register' element={ <Register />} />
+                      <Route path='/request' element={ <Request />} />
                   </Route>
                   {token && (<Route path='/user/*' element={<Maindiv />} />)}
                   <Route path='*' element={<h1>Not Found</h1>} />

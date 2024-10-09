@@ -4,10 +4,10 @@ import axios from "axios";
 import { register } from "../Types/Task";
 
 const Register: React.FC = () => {
-  const [formData, setFormData] = useState<register>({ username: "", email: "", password: "" });
+  const [formData, setFormData] = useState<register>({ username: "", email: "", password: "", firstName: "", lastName: "" });
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const [errors, setErrors] = useState<{ username?: string; email?: string; password?: string }>({});
+  const [errors, setErrors] = useState<{ username?: string; email?: string; password?: string; firstName?: string; lastName?: string }>({});
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -17,11 +17,21 @@ const Register: React.FC = () => {
     password.length >= 8 && /[A-Z]/.test(password) && /[a-z]/.test(password) && /\d/.test(password) && /[!@#$%]/.test(password);
 
   const validateForm = () => {
-    const newErrors: { username?: string; email?: string; password?: string } = {};
+    const newErrors: { username?: string; email?: string; password?: string; firstName?: string; lastName?: string } = {};
     let isValid = true;
 
     if (!formData.username) {
       newErrors.username = "Username is required";
+      isValid = false;
+    }
+
+    if(!formData.firstName){
+      newErrors.firstName = "First Name is required";
+      isValid = false;
+    }
+
+    if(!formData.lastName){
+      newErrors.lastName = "Last Name is required";
       isValid = false;
     }
 
@@ -54,7 +64,7 @@ const Register: React.FC = () => {
       const response = await axios.post("http://localhost:8080/auth/register", formData);
       setSuccessMessage(response.data.message);
       setError("");
-      setFormData({ username: "", email: "", password: "" }); // Clear form after successful registration
+      setFormData({ username: "", email: "", password: "", firstName: "", lastName: "" }); 
 
       // Remove success message after 5 seconds
       setTimeout(() => {
@@ -107,6 +117,17 @@ const Register: React.FC = () => {
             required
             error={!!errors.email}
             helperText={errors.email}
+          />
+          <TextField
+            label="First Name"
+            name="firstName"
+            value={formData.firstName}
+            onChange={handleChange}
+            fullWidth
+            margin="normal"
+            required
+            error={!!errors.firstName}
+            helperText={errors.firstName}
           />
           <TextField
             label="Password"

@@ -40,4 +40,17 @@ export interface register {
     username: string;
     email: string;
     password: string;
+    firstName : string;
+    lastName : string;
+}
+
+export interface pieChartData {
+    backlog: number;
+    inProgress: number;
+    completed: number;
+}
+
+export interface BordProps {
+    tasks: Task[];
+    updateStatus: (taskId: string, newStatus: TaskStatus) => void;
 }
