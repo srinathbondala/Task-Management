@@ -18,6 +18,8 @@ const ListView: React.FC<ListViewProps> = ({ tasks }) => {
         { field: 'updated_at', headerName: 'Updated At', width: 200 },
         { field: 'category', headerName: 'Category', width: 150 },
         { field: 'priority', headerName: 'Priority', width: 150 },
+        { field: 'project', headerName: 'project', width: 150 },
+        { field: 'due_date', headerName: 'Due Date', width: 150 },
     ];
 
     return (

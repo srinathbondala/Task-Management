@@ -5,7 +5,7 @@ require('dotenv').config();
 const jwtSecret = process.env.JWT_SECRET;
 
 exports.register = async (req, res) => {
-    const { username, email, password } = req.body;
+    const { username, email, password, firstName, lastName, role } = req.body;
     try{
         const exestingUser = await User.findOne({ email });
         if(exestingUser){
@@ -13,7 +13,7 @@ exports.register = async (req, res) => {
         }
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        const user = new User({ username, email, password: hashedPassword });
+        const user = new User({ username, email, password: hashedPassword, firstName, lastName, role});
         await user.save();
         res.status(201).json({ message: 'User created successfully!' });
     }
@@ -34,7 +34,10 @@ exports.login = async (req, res) => {
         if(!isPasswordMatch){
             return res.status(400).json({ message: 'Invalid credentials!' });
         }
-        const token = jwt.sign({ id: user._id }, jwtSecret, { expiresIn: '4h' });
+        const token = jwt.sign({ id: user._id, role: user.role}, jwtSecret, { expiresIn: '4h' });
+        const expiresIn = new Date(Date.now() + 4 * 60 * 60 * 1000);
+        res.cookie('token', token, { expires: expiresIn, sameSite: 'Strict', secure: true });
+        res.cookie('role', user.role, { expires: expiresIn,  sameSite: 'Strict', secure: true });
         res.status(200).json({ token, user: {
             id: user._id,
             username: user.username,

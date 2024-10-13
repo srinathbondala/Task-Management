@@ -20,6 +20,7 @@ const AddTask: React.FC = () => {
     const [taskStatus, setTaskStatus] = React.useState<TaskStatus>(TaskStatus.Backlog);
     const [createdAt, setCreatedAt] = React.useState<string>('');
     const [updatedAt, setUpdatedAt] = React.useState<string>('');
+    const [dueDate, setDueDate] = React.useState<string>('');
     const { token } = useToken();
     const navigate = useNavigate();
 
@@ -34,9 +35,18 @@ const AddTask: React.FC = () => {
                 setTaskStatus(task.status ?? TaskStatus.Backlog);
                 setCreatedAt(task.created_at);
                 setUpdatedAt(task.updated_at);
+                setDueDate(formatDateToDisplay(task.due_date??''));
             }
         }
     }, [id, taskContext]);
+
+    const formatDateToDisplay = (dateString: string) => {
+        const date = new Date(dateString);
+        const day = (`0${date.getDate()}`).slice(-2);
+        const month = (`0${date.getMonth() + 1}`).slice(-2);
+        const year = date.getFullYear();
+        return `${year}-${month}-${day}`;
+    };
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         let userid : string = "";
@@ -51,6 +61,7 @@ const AddTask: React.FC = () => {
             category: selectedCategory,
             created_at: createdAt || new Date().toISOString(),
             updated_at: new Date().toISOString(),
+            due_date: new Date().toISOString(),
         };
         if (taskContext) {
             if (id) {
@@ -66,7 +77,8 @@ const AddTask: React.FC = () => {
                         description: taskDescription,
                         priority: taskPriorityValue,
                         status: taskStatus,
-                        category: selectedCategory
+                        category: selectedCategory,
+                        due_date: dueDate
                     },{
                     headers: {
                         Authorization: `Bearer ${token}`
@@ -92,6 +104,7 @@ const AddTask: React.FC = () => {
             setTaskDescription('');
             setTaskPriorityValue(taskPriority.Low);
             setTaskStatus(TaskStatus.Backlog);
+            setDueDate('');
             navigate(-1);
         }
     };
@@ -129,16 +142,16 @@ const AddTask: React.FC = () => {
                 boxShadow: '0 2px 5px #ccc',
                 backgroundColor: '#fff',
             }}>
-                <IconButton
-                    sx={{ m: 1, border: '1px solid' }}
-                    color="primary"
-                    onClick={() => navigate(-1)}
-                >
-                    <ArrowBackIcon />
-                </IconButton>
-                <Box>
-                    <Typography variant="h4" textAlign={'center'} gutterBottom>{id ? 'Edit Task' : 'Add Task'}</Typography>
+                <Box sx={{display:'flex'}}>
+                    <IconButton
+                        sx={{ m: 1, border: '1px solid' }}
+                        color="primary"
+                        onClick={() => navigate(-1)}
+                    >
+                        <ArrowBackIcon />
+                    </IconButton>
                 </Box>
+                <Typography variant="h4" textAlign={'center'} gutterBottom>{id ? 'Edit Task' : 'Add Task'}</Typography>
                 <hr style={{ marginBottom: '20px' }} />
                 <Box>
                     <form onSubmit={handleSubmit}>
@@ -215,6 +228,16 @@ const AddTask: React.FC = () => {
                                     </Grid>
                                 </>
                             )}
+                            <Grid item xs={12}>
+                                <TextField
+                                    label='Due Date'
+                                    type='date'
+                                    value={dueDate}
+                                    onChange={(e) => setDueDate(e.target.value)}
+                                    fullWidth
+                                    required
+                                />
+                            </Grid>
                             <Grid item xs={12}>
                                 <TextField
                                     label='Description'

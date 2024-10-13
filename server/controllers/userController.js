@@ -205,9 +205,9 @@ const getTaskCompletions = async (req, res) => {
             completedTasks,
             completions,
         };
-        console.log(registeredTasks);
-        console.log("-------------------------------")
-        console.log(completedTasks);
+        // console.log(registeredTasks);
+        // console.log("-------------------------------")
+        // console.log(completedTasks);
 
         res.status(200).json(response);
     } catch (err) {

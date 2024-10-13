@@ -3,7 +3,7 @@ const { Schema, model } = mongoose;
 
 const taskSchema = new Schema({
     user: {
-        type: Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId || null,
         ref: 'User',
     },
     title: {
@@ -18,7 +18,7 @@ const taskSchema = new Schema({
         type: String,
         required: true,
         enum: ['backlog', 'in progress', 'completed'],
-        default: 'Backlog',
+        default: 'backlog',
     },
     created_at : {
         type: Date,
@@ -34,6 +34,10 @@ const taskSchema = new Schema({
             return currentDate.toISOString();
         }
     },
+    due_date: {
+        type: Date,
+        required: true
+    },
     category: {
         type: String,
         required: true,
@@ -43,6 +47,21 @@ const taskSchema = new Schema({
         type: String,
         required: true,
         enum: ['low', 'medium', 'high'],
+    },
+    project: {
+        id: {
+            type: Schema.Types.ObjectId,
+            ref: 'Project',
+            default: null,
+          },
+          name: {
+            type: String,
+            default: 'SELF',
+          }
+    },
+    assigned_by: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
     }
 });
 

@@ -3,10 +3,13 @@ import { AppBar, Toolbar, IconButton, Drawer, Typography, Box } from '@mui/mater
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import NavigationContent from './NavigationContent';
+import { useLocation } from 'react-router-dom';
+import AdminNavigationContent from './AdminNavigationContent';
 
 function NavigationBar() {
   const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
   const [permanentDrawerOpen, setPermanentDrawerOpen] = useState<boolean>(true);
+  const isAdmin = useLocation().pathname.startsWith('/admin');
 
   const toggleDrawer = (open: boolean) => (_event: React.KeyboardEvent | React.MouseEvent) => {
     setDrawerOpen(open);
@@ -32,7 +35,12 @@ function NavigationBar() {
         </Toolbar>
       </AppBar>
       <Drawer anchor="left" open={drawerOpen} onClose={toggleDrawer(false)}>
-        <NavigationContent toggleDrawer={toggleDrawer} />
+      {isAdmin ? (
+          <AdminNavigationContent toggleDrawer={toggleDrawer} />
+        ) : (
+          <NavigationContent toggleDrawer={toggleDrawer} />
+        )}
+        {/* <NavigationContent toggleDrawer={toggleDrawer} /> */}
       </Drawer>
 
       <Drawer
@@ -58,7 +66,11 @@ function NavigationBar() {
         >
           {permanentDrawerOpen ? <ChevronLeftIcon sx={{ color: 'white' }} /> : <MenuIcon sx={{ color: 'white' }}/>}
         </Box>
-        {permanentDrawerOpen && <NavigationContent toggleDrawer={toggleDrawer} />}
+        {permanentDrawerOpen && (isAdmin ? (
+          <AdminNavigationContent toggleDrawer={toggleDrawer} />
+        ) : (
+          <NavigationContent toggleDrawer={toggleDrawer} />
+        ))}
       </Drawer>
     </>
   );

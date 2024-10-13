@@ -5,13 +5,18 @@ interface UserProfile {
     username: string;
     fistName: string;
     lastName: string;
-    role: string;
-    tasks: any[];
+    role: 'admin' | 'user';
+    tasks: string[];
+    projects?: {
+        id: string; 
+        name: string; 
+    }[];
 }
 
 interface UserProfileContextType {
     profile: UserProfile | null;
     setProfile: (profile: UserProfile) => void;
+    updateProjects: (projects: any[]) => void;
 }
 
 const UserProfileContext = createContext<UserProfileContextType | undefined>(undefined);
@@ -19,8 +24,17 @@ const UserProfileContext = createContext<UserProfileContextType | undefined>(und
 export const UserProfileProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [profile, setProfile] = useState<UserProfile | null>(null);
 
+    const updateProjects = (projects: { id: string; name: string }[]) => {
+        setProfile((prevProfile) => {
+            if (prevProfile) {
+                return { ...prevProfile, projects };
+            }
+            return prevProfile;
+        });
+    };
+
     return (
-        <UserProfileContext.Provider value={{ profile, setProfile }}>
+        <UserProfileContext.Provider value={{ profile, setProfile , updateProjects}}>
             {children}
         </UserProfileContext.Provider>
     );

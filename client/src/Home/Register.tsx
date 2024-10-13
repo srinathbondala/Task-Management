@@ -1,13 +1,14 @@
 import React, { useState } from "react";
-import { Button, Container, TextField, Typography, Paper, Alert } from "@mui/material";
+import { Button, Container, TextField, Typography, Paper, Alert, Select, MenuItem } from "@mui/material";
+import { SelectChangeEvent } from "@mui/material/Select";
 import axios from "axios";
-import { register } from "../Types/Task";
+import { register, roleType } from "../Types/Task";
 
 const Register: React.FC = () => {
-  const [formData, setFormData] = useState<register>({ username: "", email: "", password: "", firstName: "", lastName: "" });
+  const [formData, setFormData] = useState<register>({ username: "", email: "", password: "", firstName: "", lastName: "" , role: roleType.USER});
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const [errors, setErrors] = useState<{ username?: string; email?: string; password?: string; firstName?: string; lastName?: string }>({});
+  const [errors, setErrors] = useState<{ username?: string; email?: string; password?: string; firstName?: string; lastName?: string; }>({});
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -64,12 +65,10 @@ const Register: React.FC = () => {
       const response = await axios.post("http://localhost:8080/auth/register", formData);
       setSuccessMessage(response.data.message);
       setError("");
-      setFormData({ username: "", email: "", password: "", firstName: "", lastName: "" }); 
-
-      // Remove success message after 5 seconds
+      setFormData({ username: "", email: "", password: "", firstName: "", lastName: "" , role: roleType.USER}); 
       setTimeout(() => {
         setSuccessMessage("");
-      }, 5000);
+      }, 4000);
     } catch (err: any) {
       if (err.response) {
         setError(err.response.data.message);
@@ -77,17 +76,20 @@ const Register: React.FC = () => {
         setError("An error occurred while registering. Please try again.");
       }
 
-      // Clear error after 5 seconds
       setTimeout(() => {
         setError("");
       }, 5000);
     }
   };
 
+  const handleRoleChange = (e: SelectChangeEvent<roleType>) => {
+    setFormData({ ...formData, role: e.target.value as roleType });
+  };
+
   return (
-    <Container maxWidth="sm">
-      <Paper elevation={3} sx={{ padding: 4, marginTop: 5 }}>
-        <Typography variant="h4" gutterBottom>
+    <Container maxWidth="sm" sx={{maxHeight:'100%'}}>
+      <Paper elevation={3} sx={{ padding: 4, marginTop: 5}}>
+        <Typography variant="h5" gutterBottom>
           Register
         </Typography>
 
@@ -130,6 +132,17 @@ const Register: React.FC = () => {
             helperText={errors.firstName}
           />
           <TextField
+            label="Last Name"
+            name="lastName"
+            value={formData.lastName}
+            onChange={handleChange}
+            fullWidth
+            margin="normal"
+            required
+            error={!!errors.lastName}
+            helperText={errors.lastName}
+          />
+          <TextField
             label="Password"
             name="password"
             type="password"
@@ -141,6 +154,17 @@ const Register: React.FC = () => {
             error={!!errors.password}
             helperText={errors.password}
           />
+          <Select
+            label="role"
+            id="role"
+            name="role"
+            value={formData.role}
+            onChange={handleRoleChange}
+            fullWidth
+          >
+            <MenuItem value="user">User</MenuItem>
+            <MenuItem value="admin">Admin</MenuItem>
+          </Select>
           <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
             Register
           </Button>

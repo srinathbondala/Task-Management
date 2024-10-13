@@ -1,5 +1,6 @@
 export interface Task {
     _id: string;
+    user?: string | undefined;
     title: string;
     description: string;
     status: TaskStatus;
@@ -7,6 +8,19 @@ export interface Task {
     updated_at: string;
     category ?: taskType;
     priority ?: taskPriority;
+    project ?: string;
+    assigned_to ?: string;
+    due_date ?: string;
+}
+
+export interface Project {
+    projectName: string;
+    description: string;
+    status: 'active' | 'inactive';
+    created_by: string;
+    created_at: Date;
+    users: string[];
+    tasks: Task[];
 }
 
 export enum TaskStatus {
@@ -22,6 +36,13 @@ export interface TaskContextType{
     deleteTask: (id: string) => void;
     updateStatus: (taskId: string, newStatus: TaskStatus) => void;
     updatePriority: (taskId: string, newPriority: taskPriority) => void;
+}
+
+export interface ProjectContextType{
+    projects: Project[];
+    addProject: (project: Project) => void;
+    updateProject: (project: Project) => void;
+    deleteProject: (id: string) => void;
 }
 
 export enum taskType {
@@ -42,6 +63,7 @@ export interface register {
     password: string;
     firstName : string;
     lastName : string;
+    role : roleType;
 }
 
 export interface pieChartData {
@@ -53,4 +75,14 @@ export interface pieChartData {
 export interface BordProps {
     tasks: Task[];
     updateStatus: (taskId: string, newStatus: TaskStatus) => void;
+    deleteTask?: (id: string) => void;
+}
+
+export enum roleType {
+    USER = "user",
+    ADMIN = "admin" 
+}
+
+export interface WelcomeComponentProps {
+    setSelectedProject: (project: string) => void;
 }

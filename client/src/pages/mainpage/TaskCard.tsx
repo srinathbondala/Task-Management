@@ -6,20 +6,19 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import { TaskContext } from "../../hooks/TaskContext";
 import { useNavigate } from "react-router-dom";
+import useToken from "../../hooks/useToken";
 
 interface TaskCardProps {
     task: Task;
+    deleteTaskA?: (id: string) => void;
 }
 
-const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
+const TaskCard: React.FC<TaskCardProps> = ({ task, deleteTaskA }) => {
+    const { role } = useToken();
     const [openConfirm, setOpenConfirm] = useState(false);
 
-    const taskContext = useContext(TaskContext);
-    if (!taskContext) {
-        return <div>Task Context not found</div>;
-    }
+    const taskContext = role !== 'admin' ? useContext(TaskContext) : null;
 
-    const { deleteTask } = taskContext;
     const navigate = useNavigate();
 
     const [{ isDragging }, drag] = useDrag(() => ({
@@ -39,7 +38,15 @@ const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
     }
 
     function handleConfirmDelete() {
-        deleteTask(task._id);
+        if (role === 'admin') {
+            if (deleteTaskA) {
+                deleteTaskA(task._id); 
+            }
+        } else {
+            if (taskContext && taskContext.deleteTask) {
+                taskContext.deleteTask(task._id); 
+            }
+        }
         setOpenConfirm(false);
     }
 

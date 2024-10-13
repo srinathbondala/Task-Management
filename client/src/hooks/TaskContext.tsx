@@ -7,9 +7,7 @@ import useToken from '../hooks/useToken';
 export const TaskContext = createContext<TaskContextType | undefined>(undefined);
 export const TaskProvider: React.FC<{children : ReactNode}> = ({children}) : ReactNode => {
     const { token } = useToken();
-    const [tasks, setTasks] = useState<Task[]>([
-        
-    ]);
+    const [tasks, setTasks] = useState<Task[]>([]);
 
     useEffect(() => {
         const fetchTasks = async () => {
@@ -20,7 +18,7 @@ export const TaskProvider: React.FC<{children : ReactNode}> = ({children}) : Rea
                     }
                 });
                 setTasks(response.data);
-                console.log(response.data);
+                // console.log(response.data);
             } catch (error) {
                 console.error("Error fetching tasks: ", error);
             }

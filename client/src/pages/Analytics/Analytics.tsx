@@ -11,7 +11,7 @@ const Analytics: React.FC = () => {
     const [registeredTasks, setRegisteredTasks] = useState<{ _id: string; registeredCount: number }[]>([]);
     const [completedTasks, setCompletedTasks] = useState<{ _id: string; completedCount: number }[]>([]);
     const [completions, setCompletions] = useState<{ _id: string; count: number }[]>([]);
-    const { token } = useToken();
+    const { token, role } = useToken();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -68,11 +68,14 @@ const chartData = {
     };
 
     return (
-        <Box sx={{ width: '100%', height: '100%', overflow: 'auto', marginBottom:'10px' }}>
-            <Typography variant="h4" textAlign={"center"} fontWeight={"bold"} paddingTop={2}>
-                Dashboard
-            </Typography>
-            <br />
+        <Box sx={{ width: '100%', height: '100%', marginBottom:'10px' }}>
+            {role !== 'admin' &&
+            (<>
+                <Typography variant="h4" textAlign={"center"} fontWeight={"bold"} paddingTop={2}>
+                    Dashboard
+                </Typography>
+                <br />
+            </>)}
             <Grid container height={'85%'} padding={1} gap={2}>
                 <Paper elevation={3} sx={{width:'100%', height: '100%',display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius:'16px',padding:'4px'}}>
                     <Grid item xs={12} md={6} sx={{ height: '90%',display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column'}}>

@@ -3,14 +3,17 @@ import { Box} from '@mui/material';
 import { Task, TaskStatus } from "../../Types/Task";
 import { useDrop } from 'react-dnd/src';
 import TaskCard from "./TaskCard";
+import { memo } from "react";
+import useToken from "../../hooks/useToken";
 
 interface TaskColumnParms{
     status: TaskStatus;
     tasks: Task[];
     onDropTask: (taskId : string, newStatus: TaskStatus ) => void;
+    deleteTask ?: (taskId: string) => void;
 }
-const TaskColumn : React.FC<TaskColumnParms> = ({status, tasks, onDropTask}) =>{
-
+const TaskColumn : React.FC<TaskColumnParms> = ({status, tasks, onDropTask, deleteTask}) =>{
+    const { role } = useToken();
     const [, drop] = useDrop({
         accept: 'TASK',
         drop: (item: { id: string }) => onDropTask(item.id, status),
@@ -36,11 +39,17 @@ const TaskColumn : React.FC<TaskColumnParms> = ({status, tasks, onDropTask}) =>{
             background: '#a1a1a1',
             }
          }}>
-            {tasks.map(task => (
-                <TaskCard key={task._id} task={task} />
-            ))}
+            {tasks.map(task => {
+                if(role === 'admin'){
+                    return (
+                        <TaskCard key={task._id} task={task} deleteTaskA={deleteTask}/>
+                    )
+                }
+                return (<TaskCard key={task._id} task={task} />)
+            }
+        )}
         </Box>
     );
 }
 
-export default TaskColumn;
+export default memo(TaskColumn);

@@ -6,7 +6,7 @@ import useToken from '../hooks/useToken';
 
 const LandingPage: React.FC = () => {
     const navigate = useNavigate();
-    const { saveToken } = useToken();
+    const { saveToken, saveRole } = useToken();
     const [loading, setLoading] = useState(false);
 
     const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -18,11 +18,22 @@ const LandingPage: React.FC = () => {
         const password = formData.get('password');
 
         try {
-            const response = await axios.post('http://localhost:8080/auth/login', { email, password });
-            saveToken(response.data.token);
-            // setProfile(response.data.user);
-            localStorage.setItem("data",JSON.stringify(response.data));
-            window.location.href = '/user/';
+            const response = await axios.post('http://localhost:8080/auth/login', { email, password }, {
+                withCredentials: true
+            });
+            
+            if (response.status === 200) {
+                saveToken(response.data.token);
+                saveRole(response.data.user.role);
+                if(response.data.user.role == 'admin') {
+                    localStorage.removeItem('selectedProject');
+                    localStorage.removeItem('selectedProjectName');
+                    window.location.href = '/admin';
+                }
+                else{
+                    window.location.href = '/user';
+                }
+            }
         } catch (error) {
             console.error('Login failed:', error);
         } finally {

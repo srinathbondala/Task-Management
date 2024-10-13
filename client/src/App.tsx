@@ -37,14 +37,14 @@ import LandingPage from './Home/LangingPage';
 import About from './pages/about/About';
 import Contact from './pages/contact/Contact';
 import MainLayout from './Home/MainLayout';
-import Register from './Home/Register';
 import Request from './pages/Request/Request';
 import { Box } from '@mui/material';
 import useToken from './hooks/useToken';
 import { UserProfileProvider } from './hooks/userProfileContext';
+import AdminPage from './adminMain/AdminPage';
 
 function App() {
-    const { token } = useToken();
+    const { checkToken, checkAdmin, checkUser  } = useToken();
     return (
       <UserProfileProvider>
         <BrowserRouter>
@@ -54,10 +54,10 @@ function App() {
                       <Route path='/' element={<LandingPage />} />
                       <Route path="/about" element={<About />} />
                       <Route path='/contact' element={<Contact />} />
-                      <Route path='/register' element={ <Register />} />
                       <Route path='/request' element={ <Request />} />
                   </Route>
-                  {token && (<Route path='/user/*' element={<Maindiv />} />)}
+                  {checkToken()  && checkUser() && (<Route path='/user/*' element={<Maindiv />} />)}
+                  {checkToken() && checkAdmin() && (<Route path='/admin/*' element={<AdminPage />} />)}
                   <Route path='*' element={<h1>Not Found</h1>} />
               </Routes>
           </Box>

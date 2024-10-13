@@ -39,7 +39,19 @@ const userSchema = new Schema({
         type: [Schema.Types.ObjectId],
         ref: "Task",
         default: [],
-    }
+    },
+    projects: [{
+        id: {
+            type: Schema.Types.ObjectId,
+            ref: 'Project',
+            default: null,
+          },
+          name: {
+            type: String,
+            default: 'SELF',
+          }
+        }
+    ]
 });
 
 module.exports = model("User", userSchema);
