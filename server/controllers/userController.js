@@ -11,7 +11,7 @@ const getUserProfile = async (req, res) => {
         const token = req.headers.authorization.split(' ')[1];
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const userId = decoded.id;
-        const user = await User.findById(userId).populate('tasks');
+        const user = await User.findById(userId).populate('tasks').select('-password');
         if (!user) {
             return res.status(404).send('User not found');
         }
@@ -38,7 +38,10 @@ const getUserTasks = async (req, res) => {
 const getUserTaskById = async (req, res) => {
     try {
         const { id } = req.params;
-        const task = await Task.findById(id);
+        const token = req.headers.authorization.split(' ')[1];
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const userId = decoded.id;
+        const task = await Task.findById(id).where({ user: userId });
         if (!task) {
             return res.status(404).send('Task not found');
         }
@@ -230,5 +233,4 @@ module.exports = {
     updateTaskStatus,
     updateTaskPriority,
     getTaskCompletions,
-    
 };

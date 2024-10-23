@@ -31,7 +31,7 @@ const AdminHome:React.FC = () => {
     const [currentTasks, setCurrentTasks] = useState<Task[]>([]);
     const navigate = useNavigate();
     const token = useToken().token;
-
+    
     React.useEffect(() => {
         setProjects(profile?.projects || []);
     }, [profile]);
@@ -63,34 +63,29 @@ const AdminHome:React.FC = () => {
         if (location.pathname === '/admin/dashboard') {
             setHeading('DashBoard');
         } 
-        else if(location.pathname === '/admin/dashboard/adduser') {
-            setHeading('Add User');
-        }
-        else if(location.pathname === '/admin/dashboard/analytics') {
-            setHeading('Analytics');
-        }
-        else if(location.pathname === '/admin/dashboard/project/add') {
-            setHeading('Add Project');
-        }
-        else {
-            setHeading('DashBoard');
-        }
     }, [location.pathname]);
 
     const handleProjectChange = (event: SelectChangeEvent<string>) => {
         const project = event.target.value as string;
         setSelectedProject(project);
-        console.log(projects);
-        setSelectedProjectId(projects.find((proj) => proj.name == selectedProject)?.id || '');
-        console.log(selectedProjectId);
+        const projectId = projects.find((proj) => proj.name == project)?.id || '';
+        setSelectedProjectId(projectId);
         localStorage.setItem('selectedProject', project);
-        localStorage.setItem('selectedProjectId', selectedProjectId);
-        navigate(project);
+        localStorage.setItem('selectedProjectId', projectId);
+        navigate('/admin/dashboard/'+project);
     };
 
     const updateTask = (updatedTask: Task) => {
+       setCurrentTasks((prevTasks) => {
+           return prevTasks.map((task) =>
+               task._id === updatedTask._id ? updatedTask : task
+           );
+       });
+    }
+
+    const addTask = (newTask: Task) => {
         setCurrentTasks((prevTasks) => {
-            return [...prevTasks, updatedTask];
+            return [...prevTasks, newTask];
         });
     }
 
@@ -113,7 +108,9 @@ const AdminHome:React.FC = () => {
                             >
                                 <ArrowBackIcon />
                             </IconButton>
-                            <Typography variant="h5" margin={3} fontWeight={'bold'}>{heading}</Typography>
+                            <Typography variant="h5" margin={3} fontWeight={'bold'} onClick={()=>{
+                                navigate(`/admin/dashboard/${heading}`);    
+                            }}>{heading}</Typography>
                         </Box>
                         <Box sx={{padding:2, display:'flex', gap:'10px',height:'40px'}}>
                             {
@@ -147,22 +144,23 @@ const AdminHome:React.FC = () => {
                                             variant='outlined'
                                             color="primary"
                                             startIcon={<AddIcon />}
-                                            onClick={() => {navigate(`${selectedProject}/addtask`); setHeading('Add Task')}}
+                                            onClick={() => {navigate(`${selectedProject}/addtask`);}}
                                             sx={{
                                                 textTransform: 'none',
                                                 padding: '8px 16px',
                                             }}
                                         >Add Task</Button>
-                                        <Button
+                                         {selectedProject !='SELF' && (<Button
                                             variant="outlined"
                                             color="primary"
                                             startIcon={<AccountCircleIcon />}
-                                            onClick={() => {navigate(`${selectedProject}/adduser`); setHeading('Add User')}}
+                                            onClick={() => {navigate(`${selectedProject}/adduser`);}}
                                             sx={{
                                                 textTransform: 'none',
                                                 padding: '8px 16px',
                                             }}
-                                        >Add User</Button>
+                                        >Add User</Button>)
+                                        }
                                         <Button
                                             variant="outlined"
                                             color="primary"
@@ -180,13 +178,13 @@ const AdminHome:React.FC = () => {
                     </Box>
                     <Box>
                         <Routes>
-                            <Route path="/" element={<WelcomeComponent setSelectedProject = {setSelectedProject} />} />
+                            <Route path="/" element={<WelcomeComponent setSelectedProject = {setSelectedProject} setSelectedProjectId={setSelectedProjectId}/>} />
                             <Route path="/:project" element={< ProjectMainPage selectedProject = {selectedProject} currentTasks = {currentTasks} setCurrentTasks = {setCurrentTasks}/>} />
                             <Route path="/project/add" element={<AddProject />} />
                             <Route path="/:project/analytics" element={<Analytics />} />
                             <Route path="/all/list" element={<>all pages</>} />
-                            <Route path="/:project/addtask/" element={<AdminAddTask updateTask = {updateTask} projectId = {selectedProjectId} projectName= {selectedProject}/>} />
-                            <Route path="/:project/edit/:id" element={<AdminAddTask updateTask = {updateTask} projectId = {selectedProjectId} projectName= {selectedProject}/>} />
+                            <Route path="/:project/addtask/" element={<AdminAddTask updateTask = {addTask} projectId = {selectedProjectId} projectName= {selectedProject}/>} />
+                            <Route path="/:project/edit/:id" element={<AdminAddTask tasks = {currentTasks} updateTask = {updateTask} projectId = {selectedProjectId} projectName= {selectedProject}/>} />
                             <Route path="/:project/adduser/" element={<AddUser projectId={selectedProjectId}/>} />
                             <Route path="*" element={<>404</>} />
                         </Routes>

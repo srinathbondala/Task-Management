@@ -4,7 +4,6 @@ import { Task, TaskStatus } from "../../Types/Task";
 import { useDrop } from 'react-dnd/src';
 import TaskCard from "./TaskCard";
 import { memo } from "react";
-import useToken from "../../hooks/useToken";
 
 interface TaskColumnParms{
     status: TaskStatus;
@@ -13,7 +12,6 @@ interface TaskColumnParms{
     deleteTask ?: (taskId: string) => void;
 }
 const TaskColumn : React.FC<TaskColumnParms> = ({status, tasks, onDropTask, deleteTask}) =>{
-    const { role } = useToken();
     const [, drop] = useDrop({
         accept: 'TASK',
         drop: (item: { id: string }) => onDropTask(item.id, status),
@@ -40,12 +38,9 @@ const TaskColumn : React.FC<TaskColumnParms> = ({status, tasks, onDropTask, dele
             }
          }}>
             {tasks.map(task => {
-                if(role === 'admin'){
-                    return (
-                        <TaskCard key={task._id} task={task} deleteTaskA={deleteTask}/>
-                    )
-                }
-                return (<TaskCard key={task._id} task={task} />)
+                return (
+                    <TaskCard key={task._id} task={task} deleteTaskA={deleteTask}/>
+                );
             }
         )}
         </Box>

@@ -45,6 +45,7 @@ const userSchema = new Schema({
             type: Schema.Types.ObjectId,
             ref: 'Project',
             default: null,
+            unique: true,
           },
           name: {
             type: String,

@@ -1,12 +1,11 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import { Paper, Box, Typography, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
 import { useDrag } from 'react-dnd/src';
 import { Task } from "../../Types/Task";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import { TaskContext } from "../../hooks/TaskContext";
 import { useNavigate } from "react-router-dom";
-import useToken from "../../hooks/useToken";
+import { useUserProfile } from "../../hooks/userProfileContext";
 
 interface TaskCardProps {
     task: Task;
@@ -14,10 +13,8 @@ interface TaskCardProps {
 }
 
 const TaskCard: React.FC<TaskCardProps> = ({ task, deleteTaskA }) => {
-    const { role } = useToken();
     const [openConfirm, setOpenConfirm] = useState(false);
-
-    const taskContext = role !== 'admin' ? useContext(TaskContext) : null;
+    const { selectedProjectContext } = useUserProfile();
 
     const navigate = useNavigate();
 
@@ -38,14 +35,8 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, deleteTaskA }) => {
     }
 
     function handleConfirmDelete() {
-        if (role === 'admin') {
-            if (deleteTaskA) {
-                deleteTaskA(task._id); 
-            }
-        } else {
-            if (taskContext && taskContext.deleteTask) {
-                taskContext.deleteTask(task._id); 
-            }
+        if (deleteTaskA) {
+            deleteTaskA(task._id); 
         }
         setOpenConfirm(false);
     }
@@ -97,10 +88,10 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, deleteTaskA }) => {
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: '8px' }}>
                     <Box sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', flexDirection: 'column' }}>
                         <Typography variant='caption' textAlign="start" sx={{ color: 'text.secondary' }}>
-                            Created: {task.created_at}
+                            Created: {task.created_at.split('T')[0]}
                         </Typography>
                         <Typography variant='caption' textAlign="start" sx={{ color: 'text.secondary' }}>
-                            Updated: {task.updated_at}
+                            Updated: {task.updated_at.split('T')[0]}
                         </Typography>
                     </Box>
                     <Box>
@@ -108,9 +99,10 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, deleteTaskA }) => {
                             <EditIcon fontSize="small" />
                         </IconButton>
 
-                        <IconButton onClick={onDelete} aria-label="delete" size="small" sx={{ color: 'error.main' }}>
+                        {selectedProjectContext === 'SELF' &&
+                        (<IconButton onClick={onDelete} aria-label="delete" size="small" sx={{ color: 'error.main' }}>
                             <DeleteIcon fontSize="small" />
-                        </IconButton>
+                        </IconButton>)} 
                     </Box>
                 </Box>
             </Paper>

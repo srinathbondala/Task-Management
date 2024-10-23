@@ -12,13 +12,17 @@ import { ToggleButton, ToggleButtonGroup } from '@mui/material';
 import { useState } from 'react';
 import { SelectChangeEvent } from '@mui/material';
 import { Task } from '../../Types/Task';
+import { useUserProfile} from "../../hooks/userProfileContext";
 import Board from './Board';
 import './Home.css'
 
 const Home:React.FC = () => {
     const taskContext = useContext(TaskContext);
     const [viewType, setViewType] = React.useState<string | null>('Board');
-    const [selectedProject, setSelectedProject] = useState<string >('All');
+    const [projects, setProjects] = React.useState<{id: string, name: string}[]>([]);
+    const { profile , setSelectedProjectContext, selectedProjectContext} = useUserProfile();
+    const project = selectedProjectContext===''?'SELF':selectedProjectContext;
+    const [selectedProject, setSelectedProject] = useState<string >(project||'SELF');
     
     if(!taskContext){
         return <div>Task Context not found</div>; 
@@ -29,18 +33,38 @@ const Home:React.FC = () => {
     const handleChange = (event: SelectChangeEvent<string>) => {
         const selectedProjectValue = event.target.value as string;
         setSelectedProject(selectedProjectValue);
+        setSelectedProjectContext(selectedProjectValue);
         if(selectedProjectValue === 'All') {setCurrentTasks(tasks);}
         else{
-            setCurrentTasks(tasks.filter(task => task.project === selectedProjectValue));
+            setCurrentTasks(tasks.filter(task => {
+                if(task.project?.name == selectedProjectValue){
+                    return task;
+                }
+                console.log(task.project);
+            }));
+        }
+    };
+
+    const deleteTask = (id: string) => {
+        if(taskContext && selectedProject === 'SELF'){
+            taskContext.deleteTask(id);
+        }
+        else{
+            alert('You can only delete personal tasks');
         }
     };
 
     React.useEffect(() => {
-        if(selectedProject === 'All') {setCurrentTasks(tasks);}
-        else{
-            setCurrentTasks(tasks.filter(task => task.project === selectedProject));
-        }
+        setCurrentTasks(tasks.filter(task => task.project?.name === selectedProject));
+        setSelectedProjectContext(selectedProject);
     },[tasks, selectedProject]);
+
+    React.useEffect(() => {
+        if(profile){
+            setProjects(profile.projects || []);
+            console.log(profile);
+        }
+    },[profile]);
 
     const handleTypeChange = (
         _event: React.MouseEvent<HTMLElement>,
@@ -72,10 +96,18 @@ const Home:React.FC = () => {
                                 onChange={handleChange}
                                 sx={{maxWidth:'180px', minWidth:'120px'}}
                             >
-                                <MenuItem value="All">All</MenuItem>
+                                {/* need to work on this */}
+                                {/* <MenuItem value="All">All</MenuItem> */}
+                                <MenuItem value="SELF">Personal</MenuItem>
+                                {
+                                    projects.map((project) => (
+                                        <MenuItem key={project.id} value={project.name}>{project.name}</MenuItem>
+                                    ))
+                                }
+                                {/* 
                                 <MenuItem value="SELF">Personal</MenuItem>
                                 <MenuItem value='Project X'>Project X</MenuItem>
-                                <MenuItem value='Project Y'>Project Y</MenuItem>
+                                <MenuItem value='Project Y'>Project Y</MenuItem> */}
                             </Select>
                             <ToggleButtonGroup
                                 exclusive
@@ -89,10 +121,10 @@ const Home:React.FC = () => {
                         </Box>
                     </Box>
                     <Box>
-                        {viewType === "Board" ? <Board tasks={currentTasks} updateStatus={updateStatus} /> : <ListComponents tasks={currentTasks} />}
+                        {viewType === "Board" ? <Board tasks={currentTasks} updateStatus={updateStatus} deleteTask={deleteTask} /> : <ListComponents tasks={currentTasks} />}
                     </Box>
                 </Box>
-                <AccountMenu tasks={currentTasks} />
+                <AccountMenu tasks={currentTasks} project={selectedProject}/>
             </DndProvider>
         </Container>
     );

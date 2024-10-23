@@ -16,7 +16,8 @@ const Analytics: React.FC = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get("http://localhost:8080/user/completions", {
+                const url = role === 'admin' ? "http://localhost:8080/admin/completions" : "http://localhost:8080/user/completions";
+                const response = await axios.get(url, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     }
@@ -24,6 +25,7 @@ const Analytics: React.FC = () => {
                 setRegisteredTasks(response.data.registeredTasks);
                 setCompletedTasks(response.data.completedTasks);
                 setCompletions(response.data.completions);
+                console.log(response.data);
             } catch (error) {
                 console.error("Error fetching data:", error);
             }

@@ -17,12 +17,15 @@ interface UserProfileContextType {
     profile: UserProfile | null;
     setProfile: (profile: UserProfile) => void;
     updateProjects: (projects: any[]) => void;
+    selectedProjectContext: string | null;
+    setSelectedProjectContext: (project: string ) => void;
 }
 
 const UserProfileContext = createContext<UserProfileContextType | undefined>(undefined);
 
 export const UserProfileProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [profile, setProfile] = useState<UserProfile | null>(null);
+    const [selectedProjectContext, setSelectedProjectContext] = useState<string | null>('');
 
     const updateProjects = (projects: { id: string; name: string }[]) => {
         setProfile((prevProfile) => {
@@ -34,7 +37,7 @@ export const UserProfileProvider: React.FC<{ children: React.ReactNode }> = ({ c
     };
 
     return (
-        <UserProfileContext.Provider value={{ profile, setProfile , updateProjects}}>
+        <UserProfileContext.Provider value={{ profile, setProfile , updateProjects, selectedProjectContext , setSelectedProjectContext}}>
             {children}
         </UserProfileContext.Provider>
     );

@@ -21,9 +21,10 @@ import React from 'react';
 
 interface AccountMenuProps {
     tasks: Task[];
+    project: string;
 }
 
-const AccountMenu:React.FC<AccountMenuProps> = ({tasks}) => {
+const AccountMenu:React.FC<AccountMenuProps> = ({tasks, project}) => {
     
     const navigate = useNavigate();
     const [openDialog, setOpenDialog] = useState(false);
@@ -41,7 +42,9 @@ const AccountMenu:React.FC<AccountMenuProps> = ({tasks}) => {
     
     const handleAdd = () => {
         console.log("Add Task clicked");
-        navigate('addtask');
+        if(project === 'SELF'){
+            navigate('addtask');
+        }
     };
     
     const handleShare = () => {
@@ -50,10 +53,13 @@ const AccountMenu:React.FC<AccountMenuProps> = ({tasks}) => {
     
     const actions = [
         { icon: <SaveIcon />, name: 'Save Changes', handler: handleSave },
+        { icon: <ShareIcon />, name: 'Share', handler: handleShare },
         { icon: <EditIcon />, name: 'Edit Task', handler: handleEdit },
         { icon: <AddIcon />, name: 'Add Task', handler: handleAdd },
-        { icon: <ShareIcon />, name: 'Share', handler: handleShare },
     ];
+    if(project !== 'SELF'){
+        actions.splice(2, 2);
+    }
 
     const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const searchValue = event.target.value.toLowerCase();

@@ -7,6 +7,7 @@ import { TaskContext } from "../../hooks/TaskContext";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { IconButton } from '@mui/material';
 import { useNavigate } from "react-router-dom";
+import { useUserProfile } from "../../hooks/userProfileContext";
 import axios from "axios";
 import useToken from "../../hooks/useToken";
 
@@ -22,6 +23,8 @@ const AddTask: React.FC = () => {
     const [updatedAt, setUpdatedAt] = React.useState<string>('');
     const [dueDate, setDueDate] = React.useState<string>('');
     const { token } = useToken();
+    const { selectedProjectContext } = useUserProfile();
+    const isReadonly = selectedProjectContext !== "SELF"? true: false;
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -164,6 +167,7 @@ const AddTask: React.FC = () => {
                                     onChange={(e) => setTaskTitle(e.target.value)}
                                     fullWidth
                                     required
+                                    disabled={isReadonly}
                                 />
                             </Grid>
                             <Grid item xs={3}>
@@ -173,6 +177,7 @@ const AddTask: React.FC = () => {
                                     value={selectedCategory}
                                     onChange={handleCategoryChange}
                                     fullWidth
+                                    disabled={isReadonly}
                                 >
                                     <MenuItem value={taskType.Work}>Work</MenuItem>
                                     <MenuItem value={taskType.Study}>Study</MenuItem>
@@ -186,6 +191,7 @@ const AddTask: React.FC = () => {
                                     value={taskPriorityValue}
                                     onChange={handlePriorityChange}
                                     fullWidth
+                                    disabled={isReadonly}
                                 >
                                     <MenuItem value={taskPriority.Low}>Low</MenuItem>
                                     <MenuItem value={taskPriority.Medium}>Medium</MenuItem>
@@ -200,6 +206,7 @@ const AddTask: React.FC = () => {
                                             value={taskStatus}
                                             onChange={handleStatusChange}
                                             fullWidth
+                                            disabled={isReadonly}
                                         >
                                             <MenuItem value={TaskStatus.Backlog}>Backlog</MenuItem>
                                             <MenuItem value={TaskStatus.InProgress}>In Progress</MenuItem>
@@ -236,6 +243,7 @@ const AddTask: React.FC = () => {
                                     onChange={(e) => setDueDate(e.target.value)}
                                     fullWidth
                                     required
+                                    disabled={isReadonly}
                                 />
                             </Grid>
                             <Grid item xs={12}>
@@ -248,17 +256,20 @@ const AddTask: React.FC = () => {
                                     multiline
                                     rows={4}
                                     required
+                                    disabled={isReadonly}
                                 />
                             </Grid>
 
-                            {id ? (
+                            {id? (
                                 <Grid item xs={12}>
-                                    <Button sx={{ m: 1, border: '1px solid' }} variant="outlined" color="primary" onClick={handleDelete}>
-                                        Delete Task
-                                    </Button>
-                                    <Button sx={{ m: 1, border: '1px solid' }} variant="outlined" color="primary" type="submit">
-                                        Update Task
-                                    </Button>
+                                    {selectedProjectContext === "SELF" && (
+                                        <><Button sx={{ m: 1, border: '1px solid' }} variant="outlined" color="primary" onClick={handleDelete} disabled={isReadonly}>
+                                            Delete Task
+                                        </Button><Button sx={{ m: 1, border: '1px solid' }} variant="outlined" color="primary" type="submit" disabled={isReadonly}>
+                                                Update Task
+                                            </Button></>
+                                    )
+                                }
                                 </Grid>
                             ) : (
                                 <Grid item xs={12}>

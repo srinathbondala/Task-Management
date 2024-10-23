@@ -8,7 +8,7 @@ export interface Task {
     updated_at: string;
     category ?: taskType;
     priority ?: taskPriority;
-    project ?: string;
+    project ?: projectParms;
     assigned_to ?: string;
     due_date ?: string;
 }
@@ -21,6 +21,11 @@ export interface Project {
     created_at: Date;
     users: string[];
     tasks: Task[];
+}
+
+interface projectParms {
+    projectId: string;
+    name: string;
 }
 
 export enum TaskStatus {
@@ -85,4 +90,5 @@ export enum roleType {
 
 export interface WelcomeComponentProps {
     setSelectedProject: (project: string) => void;
+    setSelectedProjectId: (id: string) => void;
 }

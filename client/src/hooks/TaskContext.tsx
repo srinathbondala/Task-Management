@@ -18,7 +18,7 @@ export const TaskProvider: React.FC<{children : ReactNode}> = ({children}) : Rea
                     }
                 });
                 setTasks(response.data);
-                // console.log(response.data);
+                console.log(response.data);
             } catch (error) {
                 console.error("Error fetching tasks: ", error);
             }

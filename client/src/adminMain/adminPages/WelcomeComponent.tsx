@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import AddIcon from '@mui/icons-material/Add';
 import { useUserProfile } from '../../hooks/userProfileContext';
 
-const WelcomeComponent: React.FC<WelcomeComponentProps> = ({setSelectedProject}) => {
+const WelcomeComponent: React.FC<WelcomeComponentProps> = ({setSelectedProject, setSelectedProjectId}) => {
     const { profile} = useUserProfile();
     const [projects, setProjects] = useState<{id: string, name: string}[]>([]);
     const [searchTerm, setSearchTerm] = useState<string>('');
@@ -19,6 +19,17 @@ const WelcomeComponent: React.FC<WelcomeComponentProps> = ({setSelectedProject})
         if(profile) setProjects(profile?.projects|| []);
         // console.log('Projects:', profile?.projects);
     }, [profile]);
+
+    const selectProjct = (project : {id: string, name: string}) => {
+        setSelectedProject(project.name); 
+        setSelectedProjectId(project.id);
+        localStorage.setItem('selectedProject', project.name);
+        localStorage.setItem('selectedProjectId',project.id); 
+        navigate(project.name)
+    }
+    // const deleteProject = (project : {id: string, name: string}) => {
+        
+    // }
 
     const filteredProjects = projects.filter(project =>
         project.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -55,7 +66,7 @@ const WelcomeComponent: React.FC<WelcomeComponentProps> = ({setSelectedProject})
                         <ListItem key={index}>
                             <Typography>{project.name}</Typography>
                         </ListItem>
-                        <Button  variant='contained' onClick={() => {setSelectedProject(project.name); localStorage.setItem('selectedProject', project.name);localStorage.setItem('selectedProjectId',project.id); navigate(project.name)}}>Select</Button>
+                        <Button  variant='contained' onClick={() => {selectProjct(project);}}>Select</Button>
                     </Paper>
                     ))}
                 </List>
