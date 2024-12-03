@@ -25,12 +25,14 @@ const AddTask: React.FC = () => {
     const { token } = useToken();
     const { selectedProjectContext } = useUserProfile();
     const isReadonly = selectedProjectContext !== "SELF"? true: false;
+    const [currentTask, setCurrentTask] = React.useState<Task | null>(null);
     const navigate = useNavigate();
 
     useEffect(() => {
         if (id && taskContext) {
             const task = taskContext.tasks.find(task => task._id == id);
             if (task) {
+                setCurrentTask(task);
                 setTaskTitle(task.title);
                 setTaskDescription(task.description);
                 setTaskPriorityValue(task.priority ?? taskPriority.Low);
@@ -66,11 +68,21 @@ const AddTask: React.FC = () => {
             updated_at: new Date().toISOString(),
             due_date: new Date().toISOString(),
         };
-        if (taskContext) {
+        if (taskContext && currentTask) {
             if (id) {
                 try{
-                    newTask._id = id;
-                    taskContext.updateTask(newTask);
+                    const updatedTask: Task = {
+                        ...currentTask,
+                        title: taskTitle,
+                        description: taskDescription,
+                        priority: taskPriorityValue,
+                        status: taskStatus,
+                        category: selectedCategory,
+                        updated_at: new Date().toISOString(),
+                        due_date: dueDate ? new Date(dueDate).toISOString() : currentTask.due_date,
+                    };
+                    updatedTask._id = id;
+                    taskContext.updateTask(updatedTask);
                     console.log('Task Updated', newTask);
                 }catch(error){}
             } else {
@@ -88,10 +100,7 @@ const AddTask: React.FC = () => {
                     }
                     })
                     .then((response) => {
-                        console.log(response);
-                        userid = response.data;
-                        newTask._id = userid;
-                        taskContext.addTask(newTask);
+                        taskContext.addTask(response.data);
                         console.log('Task Added', newTask);
                     })
                     .catch((error) => {

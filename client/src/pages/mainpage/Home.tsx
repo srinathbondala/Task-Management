@@ -62,7 +62,6 @@ const Home:React.FC = () => {
     React.useEffect(() => {
         if(profile){
             setProjects(profile.projects || []);
-            console.log(profile);
         }
     },[profile]);
 

@@ -44,6 +44,7 @@ export const TaskProvider: React.FC<{children : ReactNode}> = ({children}) : Rea
                     );
                 }
                 console.log(response.status);
+                // console.log(tasks);
             })
             .catch((error) => {
                 console.error("Error updating task: ", error);

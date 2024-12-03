@@ -60,7 +60,7 @@ const createUserTask = async (req, res) => {
         const taskData = { ...req.body, user: userId };
         const newTask = await Task.create(taskData);
         await User.findByIdAndUpdate(userId, { $push: { tasks: newTask._id } });
-        res.status(201).json(newTask._id);
+        res.status(201).json(newTask);
     } catch (err) {
         console.error(err.message);
         res.status(500).send('Server Error');
