@@ -47,9 +47,15 @@ A comprehensive task management dashboard with Kanban-style boards and integrate
 
 ### Landing Page
 ![Landing page](./screenshots/landingpage.png)
-![Request Access](./screenshots/landingpage.png)
+![Request Access](./screenshots/request-access.png)
 
 ### User Pages
+![Admin Dashboard page](./screenshots/AdminDashboard.png)
+![Admin Main Page](./screenshots/AdminMainPage.png)
+![Admin Project Dashboard](./screenshots/AdminProjectDashboard.png)
+![User Add Task Page](./screenshots/UserAddTask.png)
+![User Dashboard Page](./screenshots/UserDashboard.png)
+![User Analytics Page](./screenshots/userAnalytics.png)
 
 ## Usage
 
