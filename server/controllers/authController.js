@@ -34,7 +34,7 @@ exports.login = async (req, res) => {
         if(!isPasswordMatch){
             return res.status(400).json({ message: 'Invalid credentials!' });
         }
-        const token = jwt.sign({ id: user._id, role: user.role}, jwtSecret, { expiresIn: '4h' });
+        const token = jwt.sign({ id: user._id, name: user.username, role: user.role}, jwtSecret, { expiresIn: '4h' });
         const expiresIn = new Date(Date.now() + 4 * 60 * 60 * 1000);
         res.cookie('token', token, { expires: expiresIn, sameSite: 'Strict', secure: true });
         res.cookie('role', user.role, { expires: expiresIn,  sameSite: 'Strict', secure: true });

@@ -60,8 +60,15 @@ const taskSchema = new Schema({
           }
     },
     assigned_by: {
-        type: Schema.Types.ObjectId,
-        ref: 'User',
+        id:{
+            type: Schema.Types.ObjectId,
+            ref: 'User',
+            default: null
+        },
+        name:{
+            type: String,
+            default: null
+        }
     }
 });
 

@@ -161,13 +161,14 @@ const createTask = async (req, res) => {
     try {
         const token = req.headers.authorization.split(' ')[1];
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const AdminId = decoded.id;
+        const adminId = decoded.id;
+        const adminName = decoded.name
         const { title, description, due_date, priority, projectId, projectName, userId } = req.body;
 
         const projectObjectId = mongoose.Types.ObjectId.isValid(projectId) ? new mongoose.Types.ObjectId(projectId) : null;
         if(projectObjectId == null && projectName == 'SELF'){
             const newTask = await Task.create({
-                user: AdminId,
+                user: adminId,
                 title: title,
                 description: description,
                 due_date: due_date,
@@ -188,7 +189,7 @@ const createTask = async (req, res) => {
                 category: 'work',
                 priority: priority,
                 project: { id: projectId, name: projectName },
-                assigned_by: AdminId
+                assigned_by:  { id: adminId, name: adminName }
             });
             if (userId != null) {
                 await User.findByIdAndUpdate(userId, { $push: { tasks: newTask._id } });
