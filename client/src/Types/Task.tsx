@@ -9,8 +9,13 @@ export interface Task {
     category ?: taskType;
     priority ?: taskPriority;
     project ?: projectParms;
-    assigned_to ?: string;
+    assigned_by ?: assignedByType;
     due_date ?: string;
+}
+
+export type assignedByType = {
+    id : string;
+    name: string;
 }
 
 export interface Project {
@@ -92,3 +97,11 @@ export interface WelcomeComponentProps {
     setSelectedProject: (project: string) => void;
     setSelectedProjectId: (id: string) => void;
 }
+
+export const priorityOrder: Record<taskPriority, number> = {
+  [taskPriority.High]: 1,
+  [taskPriority.Medium]: 2,
+  [taskPriority.Low]: 3,
+};
+
+export type TaskInput = Omit<Task, '_id' | 'created_at' | 'updated_at' | 'user' | 'assigned_by' | 'project'>;

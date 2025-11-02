@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
 interface UserProfile {
     email: string;
@@ -25,12 +25,22 @@ const UserProfileContext = createContext<UserProfileContextType | undefined>(und
 
 export const UserProfileProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [profile, setProfile] = useState<UserProfile | null>(null);
-    const [selectedProjectContext, setSelectedProjectContext] = useState<string | null>('');
+    const [selectedProjectContext, setSelectedProjectContext] = useState<string | null>(() => {
+        return sessionStorage.getItem('selectedProject') || null;
+    });
+
+    useEffect(() => {
+        if (selectedProjectContext) {
+            sessionStorage.setItem('selectedProject', selectedProjectContext);
+        } else {
+            sessionStorage.removeItem('selectedProject');
+        }
+    }, [selectedProjectContext]);
 
     const updateProjects = (projects: { id: string; name: string }[]) => {
         setProfile((prevProfile) => {
             if (prevProfile) {
-                return { ...prevProfile, projects };
+                return { ...prevProfile, projects: projects };
             }
             return prevProfile;
         });

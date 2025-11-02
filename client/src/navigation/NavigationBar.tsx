@@ -1,5 +1,5 @@
 import React, { memo, useState } from 'react';
-import { AppBar, Toolbar, IconButton, Drawer, Typography, Box } from '@mui/material';
+import { AppBar, Toolbar, IconButton, Drawer, Typography, Box, Paper } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import NavigationContent from './NavigationContent';
@@ -59,12 +59,20 @@ function NavigationBar() {
             alignItems: 'center',
             justifyContent: permanentDrawerOpen ? 'flex-end' : 'center',
             padding: '0.5rem',
-            cursor: 'pointer',
-            backgroundColor: '#2c3e50' 
+            backgroundColor: '#2c3e50'
           }}
-          onClick={togglePermanentDrawer}
         >
-          {permanentDrawerOpen ? <ChevronLeftIcon sx={{ color: 'white' }} /> : <MenuIcon sx={{ color: 'white' }}/>}
+          {permanentDrawerOpen && (
+            <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1, justifyContent: permanentDrawerOpen ? 'flex-start' : 'center' }} >
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', paddingLeft: 1 }} >
+                <img src="public\vite.svg" alt="Logo" style={{ width: 40, height:20}} />
+                <Typography variant='caption' sx={{ color: 'white', flexGrow: 1, textAlign: 'center', display: permanentDrawerOpen ? 'block' : 'none' }}>
+                  Task Dashboard
+                </Typography>
+              </Box>
+            </Box>
+          )}
+          {permanentDrawerOpen ? <ChevronLeftIcon sx={{ color: 'white', cursor: 'pointer' }}  onClick={togglePermanentDrawer} /> : <MenuIcon sx={{ color: 'white', cursor: 'pointer' }}  onClick={togglePermanentDrawer} />}
         </Box>
         {permanentDrawerOpen && (isAdmin ? (
           <AdminNavigationContent toggleDrawer={toggleDrawer} />

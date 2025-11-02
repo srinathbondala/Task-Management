@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Paper, Box, Typography, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
 import { useDrag } from 'react-dnd/src';
 import { Task } from "../../Types/Task";
@@ -99,7 +99,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, deleteTaskA }) => {
                             <EditIcon fontSize="small" />
                         </IconButton>
 
-                        {selectedProjectContext === 'SELF' &&
+                        {(selectedProjectContext === 'SELF' || task.project?.name === 'SELF') &&
                         (<IconButton onClick={onDelete} aria-label="delete" size="small" sx={{ color: 'error.main' }}>
                             <DeleteIcon fontSize="small" />
                         </IconButton>)} 

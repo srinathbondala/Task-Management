@@ -12,7 +12,8 @@ interface NavigationContentProps {
 const NavigationContent: React.FC<NavigationContentProps> = ({ toggleDrawer }) => {
     const navigate = useNavigate();
     const { removeToken, token, removeRole } = useToken(); 
-    const { profile, setProfile } = useUserProfile();
+    const { profile, setProfile, selectedProjectContext} = useUserProfile();
+    const [selectedProject, setSelectedProject] = useState<string>(selectedProjectContext || 'SELF');
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
@@ -44,11 +45,11 @@ const NavigationContent: React.FC<NavigationContentProps> = ({ toggleDrawer }) =
                     </Avatar>
                 </Box>
                 <Box>
-                    <Typography sx={{ typography: { xs: 'h6' }, color: 'orange', textAlign: 'center', fontWeight: 'bold'}}>
-                        Task Dashboard
+                    <Typography sx={{ typography: { xs: 'body1' }, color: 'white', textAlign: 'start', fontWeight: 'bold'}}>
+                         {profile?.username || 'Loading...'}
                     </Typography>
-                    <Typography variant="body1" sx={{ color: 'white', textAlign: 'center', fontWeight: 'bold', marginBottom: 2 }}>
-                        {profile?.username || 'Loading...'}
+                    <Typography variant="body2" sx={{ color: 'white', textAlign: 'start', marginBottom: 2 }}>
+                        {profile?.email || 'Loading...'}
                     </Typography>
                     {error && <Typography sx={{ color: 'red' }}>{error}</Typography>}
                 </Box>
@@ -56,7 +57,12 @@ const NavigationContent: React.FC<NavigationContentProps> = ({ toggleDrawer }) =
             <Box sx={{ padding: 3, display: 'flex', alignItems: 'center', flexDirection: 'column', paddingTop: '0px' }}>
                 <Grid container spacing={2} component="div" alignItems="center" justifyContent="center">
                     <Grid item xs={12}>
-                        <Button onClick={() => { toggleDrawer(false); navigate(''); }} variant="contained" fullWidth>
+                        <Button onClick={() => { 
+                                toggleDrawer(false); 
+                                const searchParams = new URLSearchParams(location.search);
+                                searchParams.set('project', selectedProject); navigate(`/user?${searchParams.toString()}`, { replace: false, relative: 'path' }); 
+                            }} 
+                            variant="contained" fullWidth>
                             DashBoard
                         </Button>
                     </Grid>
@@ -65,6 +71,11 @@ const NavigationContent: React.FC<NavigationContentProps> = ({ toggleDrawer }) =
                             <Grid item xs={12}>
                                 <Button onClick={() => { toggleDrawer(false); navigate('analytics'); }} variant="outlined" fullWidth sx={{ color: 'white', borderColor: 'white' }}>
                                     View Analytics
+                                </Button>
+                            </Grid>
+                            <Grid item xs={12}>
+                                <Button onClick={() => { toggleDrawer(false); navigate('analytics'); }} variant="outlined" fullWidth sx={{ color: 'white', borderColor: 'white' }}>
+                                    Docs
                                 </Button>
                             </Grid>
                             <Grid item xs={12}>

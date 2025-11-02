@@ -26,6 +26,7 @@ const Maindiv: React.FC = () => {
                 <Box sx={{ bgcolor: '#ecf0f1', display: 'flex', alignItems: 'center',height:'100%', overflow:'auto'}}>
                     <Routes>
                       <Route path="/" element={<Home />} />
+                      <Route path="/home/*" element={<Home />} />
                       <Route path="/profile" element={<Profile />} />
                       <Route path="/analytics" element={<Analytics />} />
                       <Route path="/about" element={<About />} />

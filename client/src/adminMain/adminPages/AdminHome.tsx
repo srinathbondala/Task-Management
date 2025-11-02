@@ -72,7 +72,8 @@ const AdminHome:React.FC = () => {
         setSelectedProjectId(projectId);
         localStorage.setItem('selectedProject', project);
         localStorage.setItem('selectedProjectId', projectId);
-        navigate('/admin/dashboard/'+project);
+        const newUrl = `/admin/dashboard/${project}`;
+        window.location.replace(newUrl);
     };
 
     const updateTask = (updatedTask: Task) => {

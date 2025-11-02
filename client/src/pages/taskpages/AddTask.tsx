@@ -1,5 +1,5 @@
-import React, { useEffect, useContext } from "react";
-import { Box, Button, Container, Grid, TextField, Typography } from '@mui/material';
+import React, { useEffect, useContext, useState } from "react";
+import { Alert, Box, Button, Container, Grid, TextField, Typography } from '@mui/material';
 import { InputLabel, MenuItem, Select, SelectChangeEvent } from "@mui/material";
 import { taskType, taskPriority, TaskStatus, Task } from "../../Types/Task";
 import { useParams } from "react-router-dom";
@@ -10,6 +10,9 @@ import { useNavigate } from "react-router-dom";
 import { useUserProfile } from "../../hooks/userProfileContext";
 import axios from "axios";
 import useToken from "../../hooks/useToken";
+import DueDatePicker from "../../Helpers/DueDatePicker";
+import SuccessSnackbar from "../../Helpers/SuccessSnackbar";
+import { isFormDetailsValid } from "../../Utility/util";
 
 const AddTask: React.FC = () => {
     const { id } = useParams<{ id?: string }>();
@@ -26,7 +29,10 @@ const AddTask: React.FC = () => {
     const { selectedProjectContext } = useUserProfile();
     const isReadonly = selectedProjectContext !== "SELF"? true: false;
     const [currentTask, setCurrentTask] = React.useState<Task | null>(null);
+    const [showAlert, setShowAlert] = useState(false);
+    const [open, setOpen] = useState(false);
     const navigate = useNavigate();
+
 
     useEffect(() => {
         if (id && taskContext) {
@@ -52,11 +58,26 @@ const AddTask: React.FC = () => {
         const year = date.getFullYear();
         return `${year}-${month}-${day}`;
     };
-
+    
+    const handleOpen = () => setOpen(true);
+    const handleClose = (_event?: React.SyntheticEvent | Event, reason?: string) => {
+        if (reason === 'clickaway') return;
+        setOpen(false);
+    };
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         let userid : string = "";
         e.preventDefault();
-        
+        if(!isFormDetailsValid({
+            title: taskTitle,
+            description: taskDescription,
+            priority: taskPriorityValue,
+            status: taskStatus,
+            category: selectedCategory,
+            due_date: dueDate
+        })){
+            setShowAlert(true);
+            setTimeout(() => setShowAlert(false), 3000);
+        }
         const newTask: Task = {
             _id: userid || '',
             title: taskTitle,
@@ -68,8 +89,8 @@ const AddTask: React.FC = () => {
             updated_at: new Date().toISOString(),
             due_date: new Date().toISOString(),
         };
-        if (taskContext && currentTask) {
-            if (id) {
+        if (taskContext) {
+            if (id && currentTask) {
                 try{
                     const updatedTask: Task = {
                         ...currentTask,
@@ -83,6 +104,7 @@ const AddTask: React.FC = () => {
                     };
                     updatedTask._id = id;
                     taskContext.updateTask(updatedTask);
+                    handleOpen();
                     console.log('Task Updated', newTask);
                 }catch(error){}
             } else {
@@ -101,6 +123,14 @@ const AddTask: React.FC = () => {
                     })
                     .then((response) => {
                         taskContext.addTask(response.data);
+                        handleOpen();
+                        setSelectedCategory(taskType.Personal);
+                        setTaskTitle('');
+                        setTaskDescription('');
+                        setTaskPriorityValue(taskPriority.Low);
+                        setTaskStatus(TaskStatus.Backlog);
+                        setDueDate('');
+                        navigate(-1);
                         console.log('Task Added', newTask);
                     })
                     .catch((error) => {
@@ -111,13 +141,6 @@ const AddTask: React.FC = () => {
                     console.error('Error:', error);
                 }
             }
-            setSelectedCategory(taskType.Personal);
-            setTaskTitle('');
-            setTaskDescription('');
-            setTaskPriorityValue(taskPriority.Low);
-            setTaskStatus(TaskStatus.Backlog);
-            setDueDate('');
-            navigate(-1);
         }
     };
 
@@ -148,11 +171,12 @@ const AddTask: React.FC = () => {
             justifyContent: 'center',
         }}>
             <Box sx={{
-                padding: '20px',
+                padding: '10px',
                 border: '1px solid #ccc',
                 borderRadius: '5px',
                 boxShadow: '0 2px 5px #ccc',
                 backgroundColor: '#fff',
+                // margin: '20px'
             }}>
                 <Box sx={{display:'flex'}}>
                     <IconButton
@@ -245,14 +269,10 @@ const AddTask: React.FC = () => {
                                 </>
                             )}
                             <Grid item xs={12}>
-                                <TextField
-                                    label='Due Date'
-                                    type='date'
-                                    value={dueDate}
-                                    onChange={(e) => setDueDate(e.target.value)}
-                                    fullWidth
-                                    required
-                                    disabled={isReadonly}
+                                <DueDatePicker
+                                    dueDate={dueDate}
+                                    setDueDate={setDueDate}
+                                    isReadonly={isReadonly}
                                 />
                             </Grid>
                             <Grid item xs={12}>
@@ -272,11 +292,11 @@ const AddTask: React.FC = () => {
                             {id? (
                                 <Grid item xs={12}>
                                     {selectedProjectContext === "SELF" && (
-                                        <><Button sx={{ m: 1, border: '1px solid' }} variant="outlined" color="primary" onClick={handleDelete} disabled={isReadonly}>
+                                        <><Button sx={{ m: 1, border: '1px solid' }} variant="outlined" color="error" onClick={handleDelete} disabled={isReadonly}>
                                             Delete Task
                                         </Button><Button sx={{ m: 1, border: '1px solid' }} variant="outlined" color="primary" type="submit" disabled={isReadonly}>
-                                                Update Task
-                                            </Button></>
+                                            Update Task
+                                        </Button></>
                                     )
                                 }
                                 </Grid>
@@ -291,6 +311,10 @@ const AddTask: React.FC = () => {
                     </form>
                 </Box>
             </Box>
+            <SuccessSnackbar open={open} onClose={handleClose} message={id ? "Task Updated Successfully!" : "Task Added Successfully!"} />
+            {showAlert && (
+                <Alert severity="warning">Enter Complete Data</Alert>
+            )}
         </Container>
     );
 };

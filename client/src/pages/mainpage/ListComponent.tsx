@@ -34,7 +34,7 @@ const ListView: React.FC<ListViewProps> = ({ tasks }) => {
             },
         },
         { field: 'due_date', headerName: 'Due Date', width: 150 },
-        { field: 'user', headerName: 'Assignee', width: 150 },
+        { field: 'assigned_by', headerName: 'Assignee', width: 150 , renderCell: (params) => (<span>{params.row.assigned_by?.name || 'Unassigned'}</span>)},
         {
             field: 'actions',
             headerName: 'Actions',
