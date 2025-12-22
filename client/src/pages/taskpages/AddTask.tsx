@@ -13,6 +13,9 @@ import useToken from "../../hooks/useToken";
 import DueDatePicker from "../../Helpers/DueDatePicker";
 import SuccessSnackbar from "../../Helpers/SuccessSnackbar";
 import { isFormDetailsValid } from "../../Utility/util";
+import AddTaskHeader from "./taskPageHeader";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 
 const AddTask: React.FC = () => {
     const { id } = useParams<{ id?: string }>();
@@ -25,6 +28,7 @@ const AddTask: React.FC = () => {
     const [createdAt, setCreatedAt] = React.useState<string>('');
     const [updatedAt, setUpdatedAt] = React.useState<string>('');
     const [dueDate, setDueDate] = React.useState<string>('');
+    const [isPlaying, setIsPlaying] = React.useState<boolean>(false);
     const { token } = useToken();
     const { selectedProjectContext } = useUserProfile();
     const isReadonly = selectedProjectContext !== "SELF"? true: false;
@@ -161,6 +165,9 @@ const AddTask: React.FC = () => {
 
     const handleStatusChange = (e: SelectChangeEvent<TaskStatus>) => {
         setTaskStatus(e.target.value as TaskStatus);
+            if(id && taskContext){
+            taskContext.updateStatus(id,e.target.value as TaskStatus);
+        }
     };
 
     return (
@@ -187,130 +194,148 @@ const AddTask: React.FC = () => {
                         <ArrowBackIcon />
                     </IconButton>
                 </Box>
-                <Typography variant="h4" textAlign={'center'} gutterBottom>{id ? 'Edit Task' : 'Add Task'}</Typography>
+                {id ? (
+                <AddTaskHeader 
+                    heading="Edit Task"
+                    taskStatus={taskStatus}
+                    handleStatusChange={handleStatusChange}
+                    isPlaying={isPlaying}
+                    onTogglePlay={() => setIsPlaying(!isPlaying)}   
+                />) : (<Typography variant="h5" textAlign={'center'} gutterBottom>Add Task</Typography>)}
                 <hr style={{ marginBottom: '20px' }} />
-                <Box>
-                    <form onSubmit={handleSubmit}>
-                        <Grid container spacing={2}>
-                            <Grid item xs={6}>
-                                <InputLabel id="priority-label">Task Name</InputLabel>
-                                <TextField
-                                    placeholder="Title"
-                                    value={taskTitle}
-                                    onChange={(e) => setTaskTitle(e.target.value)}
-                                    fullWidth
-                                    required
-                                    disabled={isReadonly}
-                                />
-                            </Grid>
-                            <Grid item xs={3}>
-                                <InputLabel id="category-label">Category</InputLabel>
-                                <Select
-                                    labelId="category-label"
-                                    value={selectedCategory}
-                                    onChange={handleCategoryChange}
-                                    fullWidth
-                                    disabled={isReadonly}
-                                >
-                                    <MenuItem value={taskType.Work}>Work</MenuItem>
-                                    <MenuItem value={taskType.Study}>Study</MenuItem>
-                                    <MenuItem value={taskType.Personal}>Personal</MenuItem>
-                                </Select>
-                            </Grid>
-                            <Grid item xs={3}>
-                                <InputLabel id="priority-label">Priority</InputLabel>
-                                <Select
-                                    labelId="priority-label"
-                                    value={taskPriorityValue}
-                                    onChange={handlePriorityChange}
-                                    fullWidth
-                                    disabled={isReadonly}
-                                >
-                                    <MenuItem value={taskPriority.Low}>Low</MenuItem>
-                                    <MenuItem value={taskPriority.Medium}>Medium</MenuItem>
-                                    <MenuItem value={taskPriority.High}>High</MenuItem>
-                                </Select>
-                            </Grid>
-                            {id && (
-                                <>
-                                    <Grid item xs={4}>
-                                        <Select
-                                            labelId="status-label"
-                                            value={taskStatus}
-                                            onChange={handleStatusChange}
-                                            fullWidth
-                                            disabled={isReadonly}
-                                        >
-                                            <MenuItem value={TaskStatus.Backlog}>Backlog</MenuItem>
-                                            <MenuItem value={TaskStatus.InProgress}>In Progress</MenuItem>
-                                            <MenuItem value={TaskStatus.Completed}>Completed</MenuItem>
-                                        </Select>
-                                    </Grid>
-                                    <Grid item xs={4}>
-                                        <TextField
-                                            label="Created At"
-                                            value={createdAt}
-                                            fullWidth
-                                            InputProps={{
-                                                readOnly: true,
-                                            }}
-                                        />
-                                    </Grid>
-                                    <Grid item xs={4}>
-                                        <TextField
-                                            label="Updated At"
-                                            value={updatedAt}
-                                            fullWidth
-                                            InputProps={{
-                                                readOnly: true,
-                                            }}
-                                        />
-                                    </Grid>
-                                </>
-                            )}
-                            <Grid item xs={12}>
-                                <DueDatePicker
-                                    dueDate={dueDate}
-                                    setDueDate={setDueDate}
-                                    isReadonly={isReadonly}
-                                />
-                            </Grid>
-                            <Grid item xs={12}>
-                                <TextField
-                                    label='Description'
-                                    placeholder="Description"
-                                    onChange={(e) => setTaskDescription(e.target.value)}
-                                    value={taskDescription}
-                                    fullWidth
-                                    multiline
-                                    rows={4}
-                                    required
-                                    disabled={isReadonly}
-                                />
-                            </Grid>
+                    <Box>
+                        <form onSubmit={handleSubmit}>
+                            <Grid container spacing={2}>
+                                <Grid item xs={6}>
+                                    <InputLabel id="priority-label">Task Name</InputLabel>
+                                    <TextField
+                                        placeholder="Title"
+                                        value={taskTitle}
+                                        onChange={(e) => setTaskTitle(e.target.value)}
+                                        fullWidth
+                                        required
+                                        disabled={isReadonly}
+                                    />
+                                </Grid>
+                                <Grid item xs={3}>
+                                    <InputLabel id="category-label">Category</InputLabel>
+                                    <Select
+                                        labelId="category-label"
+                                        value={selectedCategory}
+                                        onChange={handleCategoryChange}
+                                        fullWidth
+                                        disabled={isReadonly}
+                                    >
+                                        <MenuItem value={taskType.Work}>Work</MenuItem>
+                                        <MenuItem value={taskType.Study}>Study</MenuItem>
+                                        <MenuItem value={taskType.Personal}>Personal</MenuItem>
+                                    </Select>
+                                </Grid>
+                                <Grid item xs={3}>
+                                    <InputLabel id="priority-label">Priority</InputLabel>
+                                    <Select
+                                        labelId="priority-label"
+                                        value={taskPriorityValue}
+                                        onChange={handlePriorityChange}
+                                        fullWidth
+                                        disabled={isReadonly}
+                                    >
+                                        <MenuItem value={taskPriority.Low}>Low</MenuItem>
+                                        <MenuItem value={taskPriority.Medium}>Medium</MenuItem>
+                                        <MenuItem value={taskPriority.High}>High</MenuItem>
+                                    </Select>
+                                </Grid>
+                                {id && (
+                                    <>
+                                        <Grid item xs={4}>
+                                            <DueDatePicker
+                                                dueDate={dueDate}
+                                                setDueDate={setDueDate}
+                                                isReadonly={isReadonly}
+                                            />
+                                        </Grid>
+                                        <Grid item xs={4}>
+                                            <TextField
+                                                label="Created At"
+                                                value={createdAt}
+                                                fullWidth
+                                                InputProps={{
+                                                    readOnly: true,
+                                                }}
+                                            />
+                                        </Grid>
+                                        <Grid item xs={4}>
+                                            <TextField
+                                                label="Updated At"
+                                                value={updatedAt}
+                                                fullWidth
+                                                InputProps={{
+                                                    readOnly: true,
+                                                }}
+                                            />
+                                        </Grid>
+                                    </>
+                                )}
+                                {!id &&
+                                <Grid item xs={12}>
+                                    <DueDatePicker
+                                        dueDate={dueDate}
+                                        setDueDate={setDueDate}
+                                        isReadonly={isReadonly}
+                                    />
+                                </Grid> }
+                                <Grid item xs={12}>
+                                    {/* <TextField
+                                        label='Description'
+                                        placeholder="Description"
+                                        onChange={(e) => setTaskDescription(e.target.value)}
+                                        value={taskDescription}
+                                        fullWidth
+                                        multiline
+                                        rows={4}
+                                        required
+                                        disabled={isReadonly}
+                                    /> */}
+                                    <ReactQuill
+                                        theme="snow"
+                                        value={taskDescription}
+                                        onChange={setTaskDescription}
+                                        readOnly={isReadonly}
+                                        placeholder="Enter task description..."
+                                        modules={{
+                                        toolbar: [
+                                            [{ header: [1, 2, 3, false] }],
+                                            ["bold", "italic", "underline", "strike"],
+                                            [{ list: "ordered" }, { list: "bullet" }],
+                                            ["link", "image", "code-block"],
+                                            ["clean"]
+                                        ]
+                                        }}
+                                    />
+                                </Grid>
 
-                            {id? (
-                                <Grid item xs={12}>
-                                    {selectedProjectContext === "SELF" && (
-                                        <><Button sx={{ m: 1, border: '1px solid' }} variant="outlined" color="error" onClick={handleDelete} disabled={isReadonly}>
-                                            Delete Task
-                                        </Button><Button sx={{ m: 1, border: '1px solid' }} variant="outlined" color="primary" type="submit" disabled={isReadonly}>
-                                            Update Task
-                                        </Button></>
-                                    )
-                                }
-                                </Grid>
-                            ) : (
-                                <Grid item xs={12}>
-                                    <Button sx={{ m: 1, border: '1px solid' }} variant="outlined" color="primary" type="submit">
-                                        Add Task
-                                    </Button>
-                                </Grid>
-                            )}
-                        </Grid>
-                    </form>
+                                {id? (
+                                    <Grid item xs={12}>
+                                        {selectedProjectContext === "SELF" && (
+                                            <><Button sx={{ m: 1, border: '1px solid' }} variant="outlined" color="error" onClick={handleDelete} disabled={isReadonly}>
+                                                Delete Task
+                                            </Button><Button sx={{ m: 1, border: '1px solid' }} variant="outlined" color="primary" type="submit" disabled={isReadonly}>
+                                                Update Task
+                                            </Button></>
+                                        )
+                                    }
+                                    </Grid>
+                                ) : (
+                                    <Grid item xs={12}>
+                                        <Button sx={{ m: 1, border: '1px solid' }} variant="outlined" color="primary" type="submit">
+                                            Add Task
+                                        </Button>
+                                    </Grid>
+                                )}
+                            </Grid>
+                        </form>
+                    </Box>
                 </Box>
-            </Box>
             <SuccessSnackbar open={open} onClose={handleClose} message={id ? "Task Updated Successfully!" : "Task Added Successfully!"} />
             {showAlert && (
                 <Alert severity="warning">Enter Complete Data</Alert>

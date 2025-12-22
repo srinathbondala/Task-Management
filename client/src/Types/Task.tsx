@@ -1,3 +1,5 @@
+import { SelectChangeEvent } from "@mui/material";
+
 export interface Task {
     _id: string;
     user?: string | undefined;
@@ -105,3 +107,12 @@ export const priorityOrder: Record<taskPriority, number> = {
 };
 
 export type TaskInput = Omit<Task, '_id' | 'created_at' | 'updated_at' | 'user' | 'assigned_by' | 'project'>;
+
+export interface AddTaskHeaderProps {
+  heading: string;
+  taskStatus: TaskStatus;
+  handleStatusChange: (value: SelectChangeEvent<TaskStatus>) => void;
+  isPlaying: boolean;
+  onTogglePlay: () => void;
+  taskTypeOptions?: string[]; // optional array of task type options
+}
