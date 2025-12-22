@@ -18,7 +18,7 @@ const CustomTextEditor: React.FC<RichTextEditorProps> = ({
   onChange,
   label,
   placeholder = "Write something...",
-  minHeight = "250px",
+  minHeight = "100px",
   fullWidth = true,
   toolbarOptions,
 }) => {

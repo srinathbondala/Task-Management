@@ -6,7 +6,7 @@ const ProtectedRoute:React.FC<{allowedRoles : UserRole[]}> = ({ allowedRoles }) 
     const { checkToken, checkAdmin, checkUser  } = useToken();
 
     if (!checkToken()) {
-        return <Navigate to="/login" replace />;
+        return <Navigate to="/" replace />;
     }
     if (allowedRoles.includes(UserRole.ADMIN) && !checkAdmin()) {
         return <Navigate to="/unauthorized" replace />;

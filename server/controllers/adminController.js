@@ -99,7 +99,7 @@ const getProjectTasksByName = async (req, res) => {
         if(!project.length){
             return res.status(404).send('Project not found');
         }
-        const tasks = await Task.find({  'project.name': projectName, assigned_by: userId });
+        const tasks = await Task.find({  'project.name': projectName, 'assigned_by.id': userId });
         if (!tasks.length) {
             return res.status(200).json({ message: 'No tasks found for this project' });
         }

@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Paper, Button, Container, Grid, TextField, Typography } from '@mui/material';
+import { Paper, Button, Container, Grid, TextField, Typography, FormControl } from '@mui/material';
 import { InputLabel, MenuItem, Select } from "@mui/material";
 import { taskType, taskPriority, TaskStatus, Task } from "../../../Types/Task";
 import { useParams } from "react-router-dom";
@@ -7,6 +7,9 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import useToken from "../../../hooks/useToken";
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
+import DueDatePicker from "../../../Helpers/DueDatePicker";
+import CustomSelect from "../../../Helpers/CustomSelect";
+import CustomTextEditor from "../../../Helpers/CustomTextEditor";
 
 interface AdminAddTaskProps {
     tasks?: Task[];
@@ -22,6 +25,9 @@ const AdminAddTask: React.FC<AdminAddTaskProps> = ({ tasks, updateTask, projectI
     const [taskPriorityValue, setTaskPriorityValue] = React.useState<taskPriority>(taskPriority.Low);
     const [selectedUser, setSelectedUser] = React.useState<string | null>(null);
     const [dueDate, setDueDate] = React.useState<string>('');
+    const [taskStatus, setTaskStatus] = React.useState<TaskStatus>(TaskStatus.Backlog);
+    const [createdAt, setCreatedAt] = React.useState<string>('');
+    const [updatedAt, setUpdatedAt] = React.useState<string>('');
     const [loading, setLoading] = React.useState<boolean>(false);
     const { token } = useToken();
     const [openDialog, setOpenDialog] = React.useState<boolean>(false);
@@ -37,6 +43,9 @@ const AdminAddTask: React.FC<AdminAddTaskProps> = ({ tasks, updateTask, projectI
                     const isoDateString = task.due_date ?? '';
                     const formattedDate = isoDateString.split('T')[0];
                     setTaskTitle(task.title);
+                    setCreatedAt(task.created_at);
+                    setUpdatedAt(task.updated_at);
+                    setTaskStatus(task.status);
                     setTaskDescription(task.description);
                     setTaskPriorityValue(task.priority ?? taskPriority.Low);
                     setDueDate(formattedDate ?? '');
@@ -52,6 +61,9 @@ const AdminAddTask: React.FC<AdminAddTaskProps> = ({ tasks, updateTask, projectI
             setDueDate('');
             setSelectedUser(null);
             setPreviousUserId(null);
+            setCreatedAt(new Date().toISOString());
+            setUpdatedAt( new Date().toISOString());
+            setTaskStatus(TaskStatus.Backlog);
         }
     }, [id]);
 
@@ -75,18 +87,19 @@ const AdminAddTask: React.FC<AdminAddTaskProps> = ({ tasks, updateTask, projectI
         e.preventDefault();
         if (loading) return;
         setLoading(true);
+        const now = new Date().toISOString();
 
         const updatedTask: Task = {
-            _id: id || '',
-            title: taskTitle,
-            description: taskDescription,
-            priority: taskPriorityValue,
-            category: taskType.Work,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-            due_date: dueDate,
-            status: TaskStatus.Backlog,
-            user: selectedUser || undefined
+        _id: id || "",
+        title: taskTitle,
+        description: taskDescription,
+        priority: taskPriorityValue,
+        category: taskType.Work,
+        due_date: dueDate,
+        status: TaskStatus.Backlog,
+        user: selectedUser || undefined,
+        created_at: id ? createdAt : now,
+        updated_at: now,
         };
 
         const userIdToSend = (selectedUser !== previousUserId) ? selectedUser : previousUserId;
@@ -146,7 +159,7 @@ const AdminAddTask: React.FC<AdminAddTaskProps> = ({ tasks, updateTask, projectI
                             />
                         </Grid>
                         <Grid item xs={12}>
-                            <TextField
+                            {/* <TextField
                                 label="Description"
                                 value={taskDescription}
                                 onChange={(e) => setTaskDescription(e.target.value)}
@@ -154,46 +167,78 @@ const AdminAddTask: React.FC<AdminAddTaskProps> = ({ tasks, updateTask, projectI
                                 multiline
                                 rows={4}
                                 required
+                            /> */}
+                             <CustomTextEditor
+                                value={taskDescription}
+                                onChange={setTaskDescription}
+                                placeholder="Add detailed task information..."
                             />
                         </Grid>
-                        <Grid item xs={6}>
-                            <InputLabel>Priority</InputLabel>
-                            <Select
+                        <Grid item xs={4}>
+                            {/* <Select
                                 value={taskPriorityValue}
                                 onChange={(e) => setTaskPriorityValue(e.target.value as taskPriority)}
                                 fullWidth
                             >
+                                <MenuItem value="" disabled>Select Category</MenuItem>
                                 <MenuItem value={taskPriority.Low}>Low</MenuItem>
                                 <MenuItem value={taskPriority.Medium}>Medium</MenuItem>
                                 <MenuItem value={taskPriority.High}>High</MenuItem>
-                            </Select>
-                        </Grid>
-                        <Grid item xs={6}>
-                            <InputLabel>Due Date</InputLabel>
-                            <TextField
-                                type="date"
-                                value={dueDate}
-                                onChange={(e) => setDueDate(e.target.value)}
-                                fullWidth
+                            </Select> */}
+                            
+                            <CustomSelect
+                                label="Priority Status"
                                 required
+                                value={taskPriorityValue}
+                                onChange={setTaskPriorityValue}
+                                options={[
+                                    { label: "Low", value: taskPriority.Low },
+                                    { label: "Medium", value: taskPriority.Medium },
+                                    { label: "High", value: taskPriority.High },
+                                ]}
+                            />
+                        </Grid>
+                        <Grid item xs={4}>
+                            <DueDatePicker
+                               dueDate={dueDate}
+                               setDueDate={setDueDate}
+                           />
+                        </Grid>
+                        <Grid item xs={4}>
+                            <TextField
+                                label="Created At"
+                                value={createdAt}
+                                fullWidth
+                                InputProps={{
+                                    readOnly: true,
+                                }}
+                            />
+                        </Grid>
+                        <Grid item xs={4}>
+                            <TextField
+                                label="Updated At"
+                                value={updatedAt}
+                                fullWidth
+                                InputProps={{
+                                    readOnly: true,
+                                }}
                             />
                         </Grid>
                         {projectName !== 'SELF' && (
-                            <Grid item xs={12}>
-                                <InputLabel>Assign User</InputLabel>
-                                <Select
-                                    value={selectedUser ?? ''}
-                                    onChange={(e) => { 
-                                        setSelectedUser(e.target.value || null); 
-                                        console.log(e.target.value);
-                                    }}
-                                    fullWidth
-                                >
-                                    <MenuItem value="">None</MenuItem>
-                                    {users.map((user, index) => (
-                                        <MenuItem key={index} value={user._id}>{user.email}</MenuItem>
-                                    ))}
-                                </Select>
+                            <Grid item xs={8}>
+                                <CustomSelect
+                                label="Assign User"
+                                required
+                                value={selectedUser ?? ''}
+                                onChange={setSelectedUser}
+                                options={ [
+                                    { label: "None", value: "" },
+                                    ...users.map((user) => ({
+                                        label: user.email,
+                                        value: user._id,
+                                    })),
+                                ]}
+                            />
                             </Grid>
                         )}
                         <Grid item xs={12} display={'flex'} gap={'10px'}>

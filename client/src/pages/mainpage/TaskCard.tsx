@@ -5,7 +5,9 @@ import { Task } from "../../Types/Task";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import { useNavigate } from "react-router-dom";
+import { stripHtml } from "../../Utility/util";
 import { useUserProfile } from "../../hooks/userProfileContext";
+
 
 interface TaskCardProps {
     task: Task;
@@ -81,7 +83,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, deleteTaskA }) => {
                             fontSize: '0.9rem',
                         }}
                     >
-                        {task.description}
+                        { stripHtml(task.description)}
                     </Typography>
                 </Box>
 
