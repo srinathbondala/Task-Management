@@ -8,6 +8,7 @@ import ListComponents from "../../../pages/mainpage/ListComponent";
 import Board from "../../../pages/mainpage/Board";
 import axios from "axios";
 import userToken from "../../../hooks/useToken";
+import { deleteTaskApi } from "../../../Utility/taskApi";
 
 interface ProjectMainPageProps {
     selectedProject: string;
@@ -43,17 +44,16 @@ const ProjectMainPage: React.FC<ProjectMainPageProps> = ({selectedProject, curre
     }
 
     const DeleteTask = async (taskId: string) => {
-        try {
-            const response = await axios.delete(`http://localhost:8080/admin/task/${taskId}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
-            if(response.status === 204){
-                setCurrentTasks((prevTasks) => prevTasks.filter((task) => task._id !== taskId));
+         try {
+            const status = await deleteTaskApi(taskId, token??'');
+
+            if (status === 204) {
+            setCurrentTasks((prevTasks) =>
+                prevTasks.filter((task) => task._id !== taskId)
+            );
             }
         } catch (error) {
-            console.error('Error deleting task:', error);
+            console.error("Error deleting task:", error);
         }
     };
 

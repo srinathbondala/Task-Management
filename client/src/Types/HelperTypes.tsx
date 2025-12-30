@@ -1,5 +1,4 @@
 import { Task } from "./Task";
-import {React} from React;
 
 export interface DueDatePickerProps {
     dueDate: string;
@@ -39,4 +38,9 @@ export interface CustomSelectProps<T extends string> {
     sm?: number;
     md?: number;
   };
+}
+export interface NoTaskProps {
+  message?: string;
+  showAddButton?: boolean;
+  addTaskPath?: string;
 }

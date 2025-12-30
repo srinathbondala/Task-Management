@@ -7,6 +7,7 @@ import NavigationBar from '../navigation/NavigationBar'
 import Register from '../Home/Register';
 import AdminHome from './adminPages/AdminHome';
 import AdminMainPage from './adminPages/AdminMainPage';
+import NoTask from '../pages/HelperPages/NoTask';
 // import { TaskProvider } from '../hooks/TaskContext'
 
 const AdminPage : React.FC = () => {
@@ -30,7 +31,7 @@ const AdminPage : React.FC = () => {
                       <Route path="/profile" element={<Profile />} />
                       <Route path="/about" element={<About />} />
                       <Route path='/register' element={ <Register />} />
-                      <Route path="*" element={<><h1>Not Found</h1></>} />
+                      <Route path="*" element={<NoTask message='No Task Found'/>} />
                     </Routes>
                 </Box>
               </Container>

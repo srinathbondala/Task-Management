@@ -54,3 +54,15 @@ exports.login = async (req, res) => {
         res.status(500).send('Server Error');
     }
 };
+
+exports.contact =  async (req,res) => {
+    const {name, email, message} = req.body;
+    try{
+        
+        res.status(200).json({ message: 'Successfully requested'});
+
+    } catch(err) {
+
+    }
+
+} 

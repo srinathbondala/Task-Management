@@ -17,3 +17,12 @@ export function stripHtml(html: string) {
   tmp.innerHTML = html;
   return tmp.textContent || tmp.innerText || "";
 }
+
+export const handleCopyLink = async ( applicationLink : string ) => {
+    try {
+        await navigator.clipboard.writeText(applicationLink);
+        alert("Link copied to clipboard!");
+    } catch (err) {
+        console.error("Failed to copy: ", err);
+    }
+};

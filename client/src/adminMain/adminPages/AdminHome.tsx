@@ -83,6 +83,10 @@ const AdminHome:React.FC = () => {
            );
        });
     }
+    
+    const deleteTask = (deletedTaskId: string) => {
+        setCurrentTasks((prevTasks) => prevTasks.filter((task) => task._id !== deletedTaskId));
+    }
 
     const addTask = (newTask: Task) => {
         setCurrentTasks((prevTasks) => {
@@ -185,7 +189,8 @@ const AdminHome:React.FC = () => {
                             <Route path="/:project/analytics" element={<Analytics />} />
                             <Route path="/all/list" element={<>all pages</>} />
                             <Route path="/:project/addtask/" element={<AdminAddTask updateTask = {addTask} projectId = {selectedProjectId} projectName= {selectedProject}/>} />
-                            <Route path="/:project/edit/:id" element={<AdminAddTask tasks = {currentTasks} updateTask = {updateTask} projectId = {selectedProjectId} projectName= {selectedProject}/>} />
+                            <Route path="/:project/edit/:id" element={<AdminAddTask tasks = {currentTasks} updateTask = {updateTask} deleteTask = {deleteTask} projectId = {selectedProjectId} projectName= {selectedProject}/>} />
+                            <Route path="/edit/:id" element={<AdminAddTask tasks = {currentTasks} updateTask = {updateTask} projectId = {selectedProjectId} projectName= {selectedProject}/>} />
                             <Route path="/:project/adduser/" element={<AddUser projectId={selectedProjectId}/>} />
                             <Route path="*" element={<>404</>} />
                         </Routes>

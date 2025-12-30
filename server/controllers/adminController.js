@@ -3,6 +3,7 @@ const Task = require('../models/Task');
 const Project = require('../models/Project');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
+const { formatTasksResponse } = require('../utility/utils');
 
 const getProfile = async (req, res) => {
     try {
@@ -92,18 +93,24 @@ const getProjectTasksByName = async (req, res) => {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const userId = decoded.id;
         if (projectName === 'SELF') {
-            const tasks = await Task.find({ user: userId });
-            return res.status(200).json(tasks);
+            const tasks = await Task.find({ user: userId })
+                .select('-linked_items -time_logs')
+                .lean();
+        
+            const tasksResponse = formatTasksResponse(tasks, 10);
+            return res.status(200).json(tasksResponse);
         }
         const project = await Project.find({projectName: projectName});
         if(!project.length){
             return res.status(404).send('Project not found');
         }
-        const tasks = await Task.find({  'project.name': projectName, 'assigned_by.id': userId });
+        const tasks = await Task.find({  'project.name': projectName, 'assigned_by.id': userId })
+        .select('-linked_items -time_logs') 
+        .lean();
         if (!tasks.length) {
             return res.status(200).json({ message: 'No tasks found for this project' });
         }
-        res.json(tasks);
+        res.json(formatTasksResponse(tasks, 10));
     } catch (err) {
         console.error(err.message);
         res.status(500).send('Server Error');
@@ -162,7 +169,7 @@ const createTask = async (req, res) => {
         const token = req.headers.authorization.split(' ')[1];
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const adminId = decoded.id;
-        const adminName = decoded.name
+        const adminName = decoded.name;
         const { title, description, due_date, priority, projectId, projectName, userId } = req.body;
 
         const projectObjectId = mongoose.Types.ObjectId.isValid(projectId) ? new mongoose.Types.ObjectId(projectId) : null;
@@ -177,7 +184,7 @@ const createTask = async (req, res) => {
                 project: { id: projectObjectId, name: projectName },
                 assigned_by: null
             });
-            await User.findByIdAndUpdate(AdminId, { $push: { tasks: newTask._id } });
+            await User.findByIdAndUpdate(adminId, { $push: { tasks: newTask._id } });
             res.status(201).json(newTask._id);
         }
         else{
@@ -233,7 +240,7 @@ const deleteTask = async (req, res) => {
             await User.findByIdAndUpdate(deletedTask.user, { $pull: { tasks: id } });
         }
 
-        if (deletedTask.project.id) {
+        if (deletedTask.project && deletedTask.project.id && deleteTask.project.name != "SELF") {
             await Project.findByIdAndUpdate(deletedTask.project.id, { $pull: { tasks: id } });
         }
 

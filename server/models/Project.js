@@ -31,6 +31,7 @@ const projectSchema = new Schema({
         type: [Schema.Types.ObjectId],
         ref: 'User',
         default: [],
+        index: true,
     },
     tasks: {
         type: [Schema.Types.ObjectId],

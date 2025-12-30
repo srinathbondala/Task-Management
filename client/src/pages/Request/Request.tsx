@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Box, Button, Container, TextField, Typography, Alert } from "@mui/material";
-import axios from 'axios';
+import { AdminRequest } from "../../Types/Task";
+import { RequestAdmin } from "../../Utility/taskApi";
 
 const ContactAdmin: React.FC = () => {
     const [name, setName] = useState('');
@@ -11,14 +12,17 @@ const ContactAdmin: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        const requestData = {
+        const requestData : AdminRequest = {
             name,
             email,
             message,
         };
 
         try {
-            // await axios.post('http://localhost:8080/api/contact-admin', requestData);
+            const status = await RequestAdmin(requestData);
+            if(!status.success){
+                setSuccess(false);
+            }
             setSuccess(true);
             setName('');
             setEmail('');

@@ -2,6 +2,7 @@ import React from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { Box, Typography } from "@mui/material";
+import '../App.css';
 
 interface RichTextEditorProps {
   value: string;
@@ -10,6 +11,7 @@ interface RichTextEditorProps {
   placeholder?: string;
   minHeight?: string;
   fullWidth?: boolean;
+  readOnly?: boolean;
   toolbarOptions?: any; // optional custom toolbar config
 }
 
@@ -20,6 +22,7 @@ const CustomTextEditor: React.FC<RichTextEditorProps> = ({
   placeholder = "Write something...",
   minHeight = "100px",
   fullWidth = true,
+  readOnly = false,
   toolbarOptions,
 }) => {
   const defaultModules = {
@@ -58,6 +61,7 @@ const CustomTextEditor: React.FC<RichTextEditorProps> = ({
         placeholder={placeholder}
         modules={defaultModules}
         formats={formats}
+        readOnly={readOnly}
         style={{
           minHeight,
           backgroundColor: "#fff",

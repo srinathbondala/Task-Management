@@ -1,8 +1,10 @@
 import React from "react";
-import { Box, Typography, Select, MenuItem, IconButton } from "@mui/material";
+import { Box, Typography, Select, MenuItem, IconButton, Tooltip } from "@mui/material";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import PauseIcon from "@mui/icons-material/Pause";
 import { AddTaskHeaderProps, TaskStatus } from "../../Types/Task";
+import LinkIcon from "@mui/icons-material/Link";
+import { handleCopyLink } from "../../Utility/util";
 
 const AddTaskHeader: React.FC<AddTaskHeaderProps> = ({
     heading,
@@ -10,6 +12,7 @@ const AddTaskHeader: React.FC<AddTaskHeaderProps> = ({
     handleStatusChange,
     isPlaying,
     onTogglePlay,
+    refLink,
 }) => {
 
   return (
@@ -29,6 +32,19 @@ const AddTaskHeader: React.FC<AddTaskHeaderProps> = ({
             sx={{ flex: 1 }}
         >
             {heading}
+            <Tooltip title="Copy application link">
+              <IconButton 
+                sx={{
+                  borderRadius: 2,
+                  transition: "all 0.2s",
+                  "&:hover": {
+                    backgroundColor: "action.hover",
+                    transform: "scale(1.05)",
+                  }}}
+                  onClick={() => {handleCopyLink(refLink ?? '')}}>
+                <LinkIcon fontSize="small"/>
+              </IconButton>
+            </Tooltip>
         </Typography>
         <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
         <Select

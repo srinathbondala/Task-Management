@@ -23,7 +23,12 @@ const linkedItemSchema = new Schema({
     created_at: {
         type: Date,
         default: () => new Date(),
-    }
+    },
+    attached_by: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        default: null,
+    },
 });
 
 module.exports = model('LinkedItems', linkedItemSchema);

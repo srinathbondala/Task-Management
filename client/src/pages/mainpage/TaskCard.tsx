@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Paper, Box, Typography, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
 import { useDrag } from 'react-dnd/src';
 import { Task } from "../../Types/Task";
@@ -16,7 +16,7 @@ interface TaskCardProps {
 
 const TaskCard: React.FC<TaskCardProps> = ({ task, deleteTaskA }) => {
     const [openConfirm, setOpenConfirm] = useState(false);
-    const { selectedProjectContext } = useUserProfile();
+    const { selectedProjectContext, profile } = useUserProfile();
 
     const navigate = useNavigate();
 
@@ -29,7 +29,12 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, deleteTaskA }) => {
     }));
 
     function onView() {
-        navigate('edit/' + task._id);
+        if(profile?.role !== 'admin'){
+            navigate(`${task.project?.name}/edit/${task._id}`);
+        }
+        else{
+            navigate('edit/' + task._id);
+        }
     }
 
     function onDelete() {
@@ -90,10 +95,10 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, deleteTaskA }) => {
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: '8px' }}>
                     <Box sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', flexDirection: 'column' }}>
                         <Typography variant='caption' textAlign="start" sx={{ color: 'text.secondary' }}>
-                            Created: {task.created_at.split('T')[0]}
+                            Created: {task.created_at? task.created_at.split('T')[0] : ''}
                         </Typography>
                         <Typography variant='caption' textAlign="start" sx={{ color: 'text.secondary' }}>
-                            Updated: {task.updated_at.split('T')[0]}
+                            Updated: {task.updated_at ? task.updated_at.split('T')[0] : ''}
                         </Typography>
                     </Box>
                     <Box>
@@ -101,7 +106,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, deleteTaskA }) => {
                             <EditIcon fontSize="small" />
                         </IconButton>
 
-                        {(selectedProjectContext === 'SELF' || task.project?.name === 'SELF') &&
+                        {(selectedProjectContext === 'SELF' || task.project?.name === 'SELF' || profile?.role === 'admin' ) &&
                         (<IconButton onClick={onDelete} aria-label="delete" size="small" sx={{ color: 'error.main' }}>
                             <DeleteIcon fontSize="small" />
                         </IconButton>)} 

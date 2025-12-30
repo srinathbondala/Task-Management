@@ -13,6 +13,23 @@ export interface Task {
     project ?: projectParms;
     assigned_by ?: assignedByType;
     due_date ?: string;
+    attachments ?: attachmentType[];
+    time_logs ?: string[];
+}
+
+export type attachmentType= {
+    task_id : string;
+    type : string;
+    title : string;
+}
+
+export type timeLogsType = {
+    task_id : string;
+    user_id : string;
+    start_time : Date,
+    end_time : Date,
+    duration : number,
+    note : string,
 }
 
 export type assignedByType = {
@@ -114,5 +131,12 @@ export interface AddTaskHeaderProps {
   handleStatusChange: (value: SelectChangeEvent<TaskStatus>) => void;
   isPlaying: boolean;
   onTogglePlay: () => void;
-  taskTypeOptions?: string[]; // optional array of task type options
+  taskTypeOptions?: string[]; 
+  refLink?: string;
+}
+
+export interface AdminRequest {
+    name : string;
+    email: string;
+    message: string;
 }

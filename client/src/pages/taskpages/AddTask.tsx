@@ -1,5 +1,6 @@
 import React, { useEffect, useContext, useState } from "react";
-import { Alert, Box, Button, Container, Grid, TextField, Typography } from '@mui/material';
+import { Alert, Box, Button, Container, Grid, TextField, Tooltip, Typography } from '@mui/material';
+import LinkIcon from "@mui/icons-material/Link";
 import { InputLabel, MenuItem, Select, SelectChangeEvent } from "@mui/material";
 import { taskType, taskPriority, TaskStatus, Task } from "../../Types/Task";
 import { useParams } from "react-router-dom";
@@ -12,14 +13,17 @@ import axios from "axios";
 import useToken from "../../hooks/useToken";
 import DueDatePicker from "../../Helpers/DueDatePicker";
 import SuccessSnackbar from "../../Helpers/SuccessSnackbar";
-import { isFormDetailsValid } from "../../Utility/util";
+import { handleCopyLink, isFormDetailsValid } from "../../Utility/util";
 import AddTaskHeader from "./taskPageHeader";
-import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
+import CustomTextEditor from "../../Helpers/CustomTextEditor";
+import { getTaskById } from "../../Utility/userApi";
+import NoTask from "../HelperPages/NoTask";
 
 const AddTask: React.FC = () => {
     const { id } = useParams<{ id?: string }>();
     const taskContext = useContext(TaskContext);
+    const [TaskNotFoundFlag, setTaskNotFoundFlag] = React.useState<boolean>(false);
     const [selectedCategory, setSelectedCategory] = React.useState<taskType>(taskType.Personal);
     const [taskTitle, setTaskTitle] = React.useState<string>('');
     const [taskDescription, setTaskDescription] = React.useState<string>('');
@@ -36,24 +40,39 @@ const AddTask: React.FC = () => {
     const [showAlert, setShowAlert] = useState(false);
     const [open, setOpen] = useState(false);
     const navigate = useNavigate();
+    const applicationLink = "https://your-app-link.com/task/123";
 
 
     useEffect(() => {
         if (id && taskContext) {
-            const task = taskContext.tasks.find(task => task._id == id);
-            if (task) {
-                setCurrentTask(task);
-                setTaskTitle(task.title);
-                setTaskDescription(task.description);
-                setTaskPriorityValue(task.priority ?? taskPriority.Low);
-                setSelectedCategory(task.category ?? taskType.Personal);
-                setTaskStatus(task.status ?? TaskStatus.Backlog);
-                setCreatedAt(task.created_at);
-                setUpdatedAt(task.updated_at);
-                setDueDate(formatDateToDisplay(task.due_date??''));
-            }
+            const fetchTask = async () => {
+                try {
+                    const response = await getTaskById(id, token ?? '');
+                    if (response.success && response.data) {
+                        const task = response.data;
+                        // const task = taskContext.tasks.find(task => task._id == id);
+                        setCurrentTask(task);
+                        setTaskTitle(task.title);
+                        setTaskDescription(task.description);
+                        setTaskPriorityValue(task.priority ?? taskPriority.Low);
+                        setSelectedCategory(task.category ?? taskType.Personal);
+                        setTaskStatus(task.status ?? TaskStatus.Backlog);
+                        setCreatedAt(task.created_at);
+                        setUpdatedAt(task.updated_at);
+                        setDueDate(formatDateToDisplay(task.due_date ?? ''));
+                    }
+                    else{
+                        setTaskNotFoundFlag(true);
+                    }
+                } catch (error) {
+                    console.error("Error fetching task:", error);
+                }
+            };
+
+            fetchTask();
         }
-    }, [id, taskContext]);
+    }, [id, taskContext, token]);
+
 
     const formatDateToDisplay = (dateString: string) => {
         const date = new Date(dateString);
@@ -170,6 +189,8 @@ const AddTask: React.FC = () => {
         }
     };
 
+    if(TaskNotFoundFlag)
+        return ( <NoTask message="No tasks available for this project" />);
     return (
         <Container sx={{
             height: '100%',
@@ -183,9 +204,16 @@ const AddTask: React.FC = () => {
                 borderRadius: '5px',
                 boxShadow: '0 2px 5px #ccc',
                 backgroundColor: '#fff',
-                // margin: '20px'
+                height: '90%',
+                overflowY: 'auto',
+                '&::-webkit-scrollbar': { width: '3px' }, 
+                '&::-webkit-scrollbar-thumb': { 
+                    backgroundColor: 'rgba(0,0,0,0.3)', 
+                    borderRadius: 3 
+                },
+                '&::-webkit-scrollbar-track': { backgroundColor: 'transparent' },
             }}>
-                <Box sx={{display:'flex'}}>
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
                     <IconButton
                         sx={{ m: 1, border: '1px solid' }}
                         color="primary"
@@ -193,15 +221,24 @@ const AddTask: React.FC = () => {
                     >
                         <ArrowBackIcon />
                     </IconButton>
+
+                    <Box sx={{ flexGrow: 1 }}>
+                        {id ? (
+                        <AddTaskHeader
+                            heading="Edit Task"
+                            taskStatus={taskStatus}
+                            handleStatusChange={handleStatusChange}
+                            isPlaying={isPlaying}
+                            onTogglePlay={() => setIsPlaying(!isPlaying)}
+                        />
+                        ) : (
+                        <Typography variant="h5" textAlign="center" gutterBottom>
+                            Add Task 
+                        </Typography>
+                        )}
+                    </Box>
                 </Box>
-                {id ? (
-                <AddTaskHeader 
-                    heading="Edit Task"
-                    taskStatus={taskStatus}
-                    handleStatusChange={handleStatusChange}
-                    isPlaying={isPlaying}
-                    onTogglePlay={() => setIsPlaying(!isPlaying)}   
-                />) : (<Typography variant="h5" textAlign={'center'} gutterBottom>Add Task</Typography>)}
+
                 <hr style={{ marginBottom: '20px' }} />
                     <Box>
                         <form onSubmit={handleSubmit}>
@@ -296,21 +333,11 @@ const AddTask: React.FC = () => {
                                         required
                                         disabled={isReadonly}
                                     /> */}
-                                    <ReactQuill
-                                        theme="snow"
+                                    <CustomTextEditor
                                         value={taskDescription}
                                         onChange={setTaskDescription}
                                         readOnly={isReadonly}
                                         placeholder="Enter task description..."
-                                        modules={{
-                                        toolbar: [
-                                            [{ header: [1, 2, 3, false] }],
-                                            ["bold", "italic", "underline", "strike"],
-                                            [{ list: "ordered" }, { list: "bullet" }],
-                                            ["link", "image", "code-block"],
-                                            ["clean"]
-                                        ]
-                                        }}
                                     />
                                 </Grid>
 

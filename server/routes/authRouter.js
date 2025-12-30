@@ -1,10 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const {register, login} = require('../controllers/authController');
+const {register, login, contact} = require('../controllers/authController');
 const Task = require('../models/Task');
 
 router.post('/register', register);
 router.post('/login', login);
+router.post('/contact-admin', contact);
 // router.put('/updateTasksProject', async (req, res) => {
 //     try {
 //         const tasks = await Task.find({});

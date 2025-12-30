@@ -12,6 +12,7 @@ import Maindiv from "../maindiv/Maindiv";
 import AdminPage from "../adminMain/AdminPage";
 import ProtectedRoute from "./ProtectedRoute";
 import Unauthorize from "../pages/HelperPages/Unauthorize";
+import ShowTaskHandler from "./ShowTaskHandler";
 
 const AppRoutes:React.FC = () => {
     return (
@@ -24,6 +25,7 @@ const AppRoutes:React.FC = () => {
                       <Route path='/contact' element={<Contact />} />
                       <Route path='/request' element={ <Request />} />
                   </Route>
+                  <Route path="/task/:id" element={<ShowTaskHandler/>}/>
                   <Route element={<ProtectedRoute allowedRoles={[UserRole.USER]} />}>
                     <Route path='/user/*' element={<Maindiv />} />
                   </Route>

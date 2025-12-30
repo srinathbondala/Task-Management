@@ -69,6 +69,41 @@ const taskSchema = new Schema({
             type: String,
             default: null
         }
+    },
+    linked_items : [
+        {
+            linked_id : {
+                type: Schema.Types.ObjectId,
+                ref: 'Task'
+            },
+            relation : {
+                type: String,
+                required: true,
+                enum: ['Dependent On', 'Done Before', 'Blocked By', 'Done After'],
+            }
+        }
+    ],
+    attachments: [
+        {
+            type: {
+                type: String,
+                required: true,
+            },
+            ref_id: {
+                type: Schema.Types.ObjectId,
+                ref: 'LinkedItems'
+            },
+            title: {
+                type: String,
+            }
+        },
+    ],
+    time_logs: {
+        logs: [{
+            type: Schema.Types.ObjectId,
+            ref: 'Timelogs',
+        }],
+        default: [],
     }
 });
 

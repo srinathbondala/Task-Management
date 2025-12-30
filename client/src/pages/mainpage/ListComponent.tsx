@@ -4,6 +4,7 @@ import { Task } from '../../Types/Task';
 import { Grid } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import EditIcon from '@mui/icons-material/Edit';
+import { stripHtml } from '../../Utility/util';
 
 interface ListViewProps {
     tasks: Task[];
@@ -13,13 +14,20 @@ const ListView: React.FC<ListViewProps> = ({ tasks }) => {
     const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 6 });
     const navigate = useNavigate();
 
-    const onView = (taskId: string) => {
-        navigate('edit/' + taskId);
+    const onView = (taskId: string, project : string) => {
+        // navigate('edit/' + taskId);
+        navigate(`${project}/edit/${taskId}`);
     };
 
     const columns: GridColDef[] = [
         { field: 'title', headerName: 'Title', width: 200 },
-        { field: 'description', headerName: 'Description', width: 300 },
+        { 
+            field: 'description',
+            headerName: 'Description',
+            width: 300,
+            valueGetter: (parms : any) => 
+                 stripHtml(parms || ''),
+        },
         { field: 'status', headerName: 'Status', width: 150 },
         { field: 'created_at', headerName: 'Created At', width: 200 },
         { field: 'updated_at', headerName: 'Updated At', width: 200 },
@@ -44,7 +52,7 @@ const ListView: React.FC<ListViewProps> = ({ tasks }) => {
                 <GridActionsCellItem
                     icon={<EditIcon />}
                     label="Edit"
-                    onClick={() => onView(params.row._id)}
+                    onClick={() => onView(params.row._id, params.row.project?.name ?? "Personal")}
                 />
             ]
         }

@@ -2,6 +2,7 @@ const User = require('../models/User');
 const Task = require('../models/Task');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
+const { formatTasksResponse } = require('../utility/utils');
 // const getUserPage = async (req, res) => {
 //     res.send('Welcome to the User Page');
 // };
@@ -27,8 +28,13 @@ const getUserTasks = async (req, res) => {
         const token = req.headers.authorization.split(' ')[1];
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const userId = decoded.id;
-        const tasks = await Task.find({ user: userId });
-        res.json(tasks);
+        // const tasks = await Task.find({ user: userId });
+        const tasks = await Task.find({ user: userId })
+        .select('-linked_items -time_logs')
+        .lean();
+
+        const tasksResponse = formatTasksResponse(tasks, 10)
+        res.json(tasksResponse);
     } catch (err) {
         console.error(err.message);
         res.status(500).send('Server Error');
@@ -41,11 +47,44 @@ const getUserTaskById = async (req, res) => {
         const token = req.headers.authorization.split(' ')[1];
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const userId = decoded.id;
-        const task = await Task.findById(id).where({ user: userId });
-        if (!task) {
-            return res.status(404).send('Task not found');
+        const task_initial = await Task.findById(id).where({ user: userId });
+        if(task_initial?.project.name === 'SELF'){
+            return res.status(200).json(task_initial);
         }
-        res.json(task);
+
+        const task = await Task.aggregate([
+            { $match: { _id: new mongoose.Types.ObjectId(id) } },
+            {
+                $lookup: {
+                from: 'projects',
+                localField: 'project.id',
+                foreignField: '_id',
+                as: 'project',
+                },
+            },
+            { $unwind: '$project' },
+            {
+                $match: {
+                'project.users': new mongoose.Types.ObjectId(userId),
+                },
+            },
+        ]);
+       if (!task.length) {
+            return res.status(403).json({
+                message: 'Task not found or access denied',
+            });
+        }
+
+        const finalTask =  await Task.findOne({ _id: task[0]._id })
+        .populate({ path: 'user', select: 'firstName lastName' })
+        .populate({ path: 'attachments' })
+        .populate({ path: 'linked_items.linked_id', select: 'title _id' })
+        .populate({ path: 'time_logs' });
+
+        if (!finalTask || !finalTask.project?.id) {
+            return res.status(403).json({ message: 'Task not found or access denied' });
+        }
+        return res.status(200).json(finalTask);
     } catch (err) {
         console.error(err.message);
         res.status(500).send('Server Error');
@@ -134,7 +173,15 @@ const updateTaskPriority = async (req, res) => {
 const getUserTasksPriority = async (req, res) => {
     try {
         const userId = req.user._id;
-        const tasks = await Task.find({ user: userId }).sort({ priority: 1 });
+        const { formatTasksResponse } = require('../utils/taskUtils');
+
+        const tasks = await Task.find({ user: userId })
+        .select('-linked_items -time_logs')
+        .sort({ priority: 1 })   // DB-level sorting
+        .lean();
+
+        res.status(200).json(formatTasksResponse(tasks));
+
         res.json(tasks);
     } catch (err) {
         console.error(err.message);

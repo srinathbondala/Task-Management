@@ -4,7 +4,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
 import ShareIcon from '@mui/icons-material/Share';
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Task } from '../../Types/Task';
 import {
     Dialog,
@@ -29,7 +29,11 @@ const AccountMenu:React.FC<AccountMenuProps> = ({tasks, project}) => {
     const navigate = useNavigate();
     const [openDialog, setOpenDialog] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
-    const [filteredTasks, setFilteredTasks] = useState(tasks);
+    const [filteredTasks, setFilteredTasks] = useState<Task[]>([]);
+
+    useEffect( () => {
+        setFilteredTasks(tasks);
+    },[tasks]);
 
     const handleSave = () => {
         console.log("Save Changes clicked");
@@ -43,7 +47,7 @@ const AccountMenu:React.FC<AccountMenuProps> = ({tasks, project}) => {
     const handleAdd = () => {
         console.log("Add Task clicked");
         if(project === 'SELF'){
-            navigate('addtask');
+            navigate(`${project}/addtask`);
         }
     };
     
@@ -71,7 +75,7 @@ const AccountMenu:React.FC<AccountMenuProps> = ({tasks, project}) => {
     };
 
     const handleTaskSelect = (taskId: string) => {
-        navigate(`edit/${taskId}`);
+        navigate(`${project}/edit/${taskId}`);
         setOpenDialog(false);
     };
 

@@ -25,6 +25,7 @@ const DueDatePicker: React.FC<DueDatePickerProps> = ({ dueDate, setDueDate, isRe
                     textField: {
                         fullWidth: true,
                         required: true,
+                        size: "small"
                     },
                 }}
             />

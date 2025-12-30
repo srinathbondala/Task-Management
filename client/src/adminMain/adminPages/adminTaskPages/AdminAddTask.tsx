@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
 import { Paper, Button, Container, Grid, TextField, Typography, FormControl } from '@mui/material';
-import { InputLabel, MenuItem, Select } from "@mui/material";
 import { taskType, taskPriority, TaskStatus, Task } from "../../../Types/Task";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
@@ -10,15 +9,17 @@ import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } 
 import DueDatePicker from "../../../Helpers/DueDatePicker";
 import CustomSelect from "../../../Helpers/CustomSelect";
 import CustomTextEditor from "../../../Helpers/CustomTextEditor";
+import { deleteTaskApi } from "../../../Utility/taskApi";
 
 interface AdminAddTaskProps {
     tasks?: Task[];
     updateTask: (task: Task) => void;
+    deleteTask?: (taskId: string) => void
     projectId: string;
     projectName: string;
 }
 
-const AdminAddTask: React.FC<AdminAddTaskProps> = ({ tasks, updateTask, projectId, projectName }) => {
+const AdminAddTask: React.FC<AdminAddTaskProps> = ({ tasks, updateTask, deleteTask ,projectId, projectName }) => {
     const { id } = useParams<{ id?: string }>();
     const [taskTitle, setTaskTitle] = React.useState<string>('');
     const [taskDescription, setTaskDescription] = React.useState<string>('');
@@ -139,6 +140,27 @@ const AdminAddTask: React.FC<AdminAddTaskProps> = ({ tasks, updateTask, projectI
         });
     };
 
+    const deleteAdminTask = async () =>{
+        if (loading) return;
+        setLoading(true);
+        try{
+            const response = await deleteTaskApi(id ?? "",token ?? "");
+            if(response === 204){
+                if(deleteTask != undefined)
+                    deleteTask(id??"");
+                setDialogMessage(`Task deleted successfully!`);
+                setOpenDialog(true);
+                setTimeout(() => {
+                    navigate(-1);
+                }, 2000);
+            }
+        } catch(error){
+            console.error("An error occurred:", error);
+        } finally{
+            setLoading(false);
+        }
+    }
+
     const handleCloseDialog = () => {
         setOpenDialog(false);
     };
@@ -245,7 +267,7 @@ const AdminAddTask: React.FC<AdminAddTaskProps> = ({ tasks, updateTask, projectI
                             <Button type="submit" variant="outlined" color="primary">
                                 {id ? 'Update Task' : 'Add Task'}
                             </Button>
-                            {id && <Button variant="outlined" color='error'> Delete Task </Button>}
+                            {id && <Button variant="outlined" onClick={deleteAdminTask} color='error'> Delete Task </Button>}
                         </Grid>
                     </Grid>
                 </form>

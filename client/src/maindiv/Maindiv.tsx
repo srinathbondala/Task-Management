@@ -8,6 +8,7 @@ import Home from '../pages/mainpage/Home'
 import Analytics from '../pages/Analytics/Analytics';
 import AddTask from '../pages/taskpages/AddTask';
 import { TaskProvider } from '../hooks/TaskContext'
+import NoTask from '../pages/HelperPages/NoTask';
 const Maindiv: React.FC = () => {
     return (
       <>
@@ -30,9 +31,10 @@ const Maindiv: React.FC = () => {
                       <Route path="/profile" element={<Profile />} />
                       <Route path="/analytics" element={<Analytics />} />
                       <Route path="/about" element={<About />} />
-                      <Route path="/addtask/" element={<AddTask />} />
+                      <Route path="/:project/addtask/" element={<AddTask />} />
+                      <Route path="/:project/edit/:id" element={<AddTask />} />
                       <Route path="/edit/:id" element={<AddTask />} />
-                      <Route path="*" element={<><h1>Not Found</h1></>} />
+                      <Route path="*" element={<NoTask message='No Task Found'/>} />
                     </Routes>
                 </Box>
               </Container>
